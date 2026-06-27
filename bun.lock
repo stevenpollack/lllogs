@@ -491,12 +491,18 @@
 
     "@lllogs/server/@lllogs/shared": ["@lllogs/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
 
+    "@lllogs/tui/@lllogs/server": ["@lllogs/server@file:packages/server", { "dependencies": { "@lllogs/shared": "file:../shared", "hono": "^4.6.0", "pino": "^10.3.1" }, "devDependencies": { "@lllogs/ingest": "file:../ingest", "@types/bun": "^1.3.14" } }],
+
     "@lllogs/tui/@lllogs/shared": ["@lllogs/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
 
     "@lllogs/web/@lllogs/shared": ["@lllogs/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
 
     "thread-stream/real-require": ["real-require@1.0.0", "", {}, "sha512-P4nbQYQfePJxRSmY+v/KINxVucm4NF3p3s7pJveMTtom52FR4YGltUQLB8idDXwDDWW+eYrWDFbuzUnjoWHF7g=="],
 
-    "@lllogs/server/@lllogs/ingest/@lllogs/shared": ["@lllogs/shared@file:packages/shared", {}],
+    "@lllogs/server/@lllogs/ingest/@lllogs/shared": ["@lllogs/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
+
+    "@lllogs/tui/@lllogs/server/@lllogs/ingest": ["@lllogs/ingest@file:packages/ingest", {}],
+
+    "@lllogs/tui/@lllogs/server/@lllogs/shared": ["@lllogs/shared@file:packages/shared", {}],
   }
 }
