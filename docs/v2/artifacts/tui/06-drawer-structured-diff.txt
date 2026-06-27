@@ -1,0 +1,23 @@
+clogdy ▸ LIVE ● · 10/5m
+time     06-27 20:25:50
+project  web
+session  sess-aaaa1111
+kind     tool_use
+role     assistant
+tool     Edit
+corr     c-02
+branch   main
+
+COMMAND
+src/server.ts
+
+DIFF
+diff --git a/src/server.ts b/src/server.ts
+--- a/src/server.ts
++++ b/src/server.ts
+@@ -10,2 +10,3 @@
+ const app = new Hono()
+-app.get('/', h)
++app.get('/', handler)
++app.get('/healthz', ok)
+↑↓ scroll · r raw/structured · x correlate · q/esc close

@@ -1,0 +1,14 @@
+clogdy ▸ LIVE ● · 10/5m
+[x] PIN   TIME
+[x]       PROJECT
+[x]       SESSION
+[x]       KIND
+[x]       TOOL
+[x]       COMMAND
+[x]       ERR
+[ ]       RESULT
+[ ]       TEXT
+[ ]       CORR
+[ ]       DUR
+[ ]       BRANCH
+↑↓ move · space show/hide · f freeze · s sort · c/esc close

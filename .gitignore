@@ -1,0 +1,13 @@
+node_modules/
+*.log
+
+# Playwright MCP scratch output (screenshots/snapshots from manual UI verification).
+.playwright-mcp/
+
+# Playwright (@playwright/test) recorded artifacts — videos/traces are large; committed PNGs live under docs/v2/artifacts/.
+test-results/
+packages/web/playwright-report/
+packages/web/test-results/
+
+# Agent isolation git worktrees (created by the WorktreeCreate hook) — transient.
+.claude/worktrees/

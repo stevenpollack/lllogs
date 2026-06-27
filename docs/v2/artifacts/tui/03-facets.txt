@@ -1,0 +1,16 @@
+clogdy ▸ LIVE ● · 10/5m
+PROJECT   ○ web                            7
+          ○ api                            3
+SESSION   ○ sess-aaaa1111                  7
+          ○ sess-bbbb2222                  3
+TOOL      ○ Bash                           2
+          ○ Read                           1
+          ○ Edit                           1
+          ○ Grep                           1
+KIND      ○ tool_use                       5
+          ○ tool_result                    3
+          ○ prompt                         1
+          ○ thinking                       1
+ROLE      ○ assistant                      10
+ERROR     ○ error                          1
+↑↓ move · space toggle · f/esc close

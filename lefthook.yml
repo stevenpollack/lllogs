@@ -1,0 +1,15 @@
+# Run `lefthook install` once per clone to activate (or `bun install` — the
+# package.json "prepare" script does it for you).
+pre-commit:
+  jobs:
+    - name: typecheck
+      # Whole-project type check; tsc has no staged-file mode worth the complexity.
+      run: bun run check
+    - name: test
+      run: bun test
+    - name: format
+      # oxfmt --check over the v2 TypeScript (dist + JSON ignored).
+      run: bun run format:check
+    - name: lint
+      # oxlint curated correctness rules over packages/.
+      run: bun run lint

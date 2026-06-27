@@ -1,0 +1,14 @@
+clogdy ▸ LIVE ● · 10/5m
+TIME           PROJECT          SESSION  KIND        TOOL
+06-27 20:24:50 web              sess-aaa prompt
+06-27 20:25:10 web              sess-aaa tool_use    Read
+06-27 20:25:15 web              sess-aaa tool_result
+06-27 20:25:50 web              sess-aaa tool_use    Edit
+06-27 20:25:52 web              sess-aaa tool_result
+06-27 20:26:50 web              sess-aaa tool_use    Bash
+06-27 20:26:52 web              sess-aaa tool_result
+06-27 20:27:50 api              sess-bbb tool_use    Grep
+06-27 20:28:10 api              sess-bbb tool_use    Bash
+06-27 20:28:38 api              sess-bbb thinking
+10/10 · frozen: time · more ▶
+↑↓ move · ←→ cols · ↵ detail · / search · f facets · c columns · p pause · q quit

@@ -1,0 +1,21 @@
+clogdy ▸ LIVE ● · 10/5m
+{
+  "toolUseResult": {
+    "filePath": "src/server.ts",
+    "structuredPatch": [
+      {
+        "oldStart": 10,
+        "oldLines": 2,
+        "newStart": 10,
+        "newLines": 3,
+        "lines": [
+          " const app = new Hono()",
+          "-app.get('/', h)",
+          "+app.get('/', handler)",
+          "+app.get('/healthz', ok)"
+        ]
+      }
+    ]
+  }
+}
+↑↓ scroll · r raw/structured · x correlate · q/esc close

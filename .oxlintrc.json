@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": { "correctness": "error" },
+  "rules": {
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "no-shadow": "error",
+    "no-promise-executor-return": "error"
+  },
+  "ignorePatterns": ["**/dist/**", "**/*.d.ts"]
+}
