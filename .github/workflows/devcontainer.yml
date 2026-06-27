@@ -69,7 +69,12 @@ jobs:
             set -euo pipefail
             cs=$(date +%s); bun run check; ce=$(date +%s)
             ts=$(date +%s); bun test;      te=$(date +%s)
-            printf 'check_s=%s\ntest_s=%s\n' "$((ce - cs))" "$((te - ts))" > .ci-timing.env
+            check_s=$((ce - cs)); test_s=$((te - ts))
+            # Echo to stdout (always visible in this step's log) AND to the file
+            # the host summarizes — the file relies on the container write
+            # persisting to the host workspace, the echo does not.
+            echo "in-container timing: check=${check_s}s test=${test_s}s"
+            printf 'check_s=%s\ntest_s=%s\n' "${check_s}" "${test_s}" > .ci-timing.env
 
       - name: Summarize timing
         if: always()
