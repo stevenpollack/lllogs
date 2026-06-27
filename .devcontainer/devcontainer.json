@@ -21,12 +21,6 @@
   // container-scoped Claude settings.json that bypasses permissions by default.
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
-  "customizations": {
-    "vscode": {
-      "extensions": ["oven.bun-vscode"]
-    }
-  },
-
   // Default to the non-root user that owns the Bun install.
   "remoteUser": "vscode"
 }

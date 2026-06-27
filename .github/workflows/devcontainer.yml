@@ -1,0 +1,67 @@
+# Builds the devcontainer and runs the test suite INSIDE it — validating the
+# exact environment future subagents use (Dockerfile, Bun pin, gh feature,
+# postCreate: bun install + Claude install + settings).
+#
+# Its second purpose is measurement: it times the in-container suite and the
+# total build+postCreate+suite cost, written to the job summary, so we can judge
+# whether running the suite in the devcontainer is viable as THE PR gate (vs the
+# fast host job in ci.yml). Make this a required check once the numbers justify it.
+name: Devcontainer
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: devcontainer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # devcontainer.json wires the key via `docker run --env-file`, which is a
+      # HARD error if the file is missing. check/test need no real key, so stub
+      # an empty one; the real key only matters for `claude` itself.
+      - name: Stub .env (--env-file requires the file to exist)
+        run: echo "ANTHROPIC_API_KEY=" > .devcontainer/.env
+
+      - name: Record start (build + postCreate + suite)
+        id: t0
+        run: echo "epoch=$(date +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Build devcontainer and run suite inside it
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          # Runs after the image is built and postCreateCommand has completed
+          # (deps installed). Times each phase and writes seconds to a workspace
+          # file the host reads back for the summary.
+          runCmd: |
+            set -euo pipefail
+            cs=$(date +%s); bun run check; ce=$(date +%s)
+            ts=$(date +%s); bun test;      te=$(date +%s)
+            printf 'check_s=%s\ntest_s=%s\n' "$((ce - cs))" "$((te - ts))" > .ci-timing.env
+
+      - name: Summarize timing
+        if: always()
+        run: |
+          total=$(( $(date +%s) - ${{ steps.t0.outputs.epoch }} ))
+          {
+            echo "## Devcontainer suite timing"
+            echo ""
+            echo "| Phase | Seconds |"
+            echo "| --- | ---: |"
+            if [ -f .ci-timing.env ]; then
+              . ./.ci-timing.env
+              echo "| bun run check (in container) | ${check_s} |"
+              echo "| bun test (in container) | ${test_s} |"
+            else
+              echo "| in-container suite | did not complete |"
+            fi
+            echo "| Total (build + postCreate + suite) | ${total} |"
+          } >> "$GITHUB_STEP_SUMMARY"
