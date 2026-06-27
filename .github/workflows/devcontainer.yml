@@ -2,10 +2,14 @@
 # exact environment future subagents use (Dockerfile, Bun pin, gh feature,
 # postCreate: bun install + Claude install + settings).
 #
-# Its second purpose is measurement: it times the in-container suite and the
-# total build+postCreate+suite cost, written to the job summary, so we can judge
-# whether running the suite in the devcontainer is viable as THE PR gate (vs the
-# fast host job in ci.yml). Make this a required check once the numbers justify it.
+# Caching: main/manual runs build the image and push it to GHCR (push: always),
+# warming a layer cache; PR runs pull it via cacheFrom and only build the delta
+# + run the suite (push: never). This keeps the gate fast enough to be required.
+#
+# Second purpose is measurement: it times the in-container suite and the total
+# build+postCreate+suite cost to the job summary, so we can judge whether to make
+# this a required PR check. Caching only warms AFTER the first main build pushes
+# the image — the PR that introduces this workflow still pays a cold build.
 name: Devcontainer
 
 on:
@@ -18,11 +22,26 @@ concurrency:
   group: devcontainer-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: write # push the prebuilt image to GHCR on main/manual runs
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}-devcontainer
+
 jobs:
   suite:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Needed to pull the cache image and (on main/manual) push the rebuilt one.
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # devcontainer.json wires the key via `docker run --env-file`, which is a
       # HARD error if the file is missing. check/test need no real key, so stub
@@ -34,10 +53,14 @@ jobs:
         id: t0
         run: echo "epoch=$(date +%s)" >> "$GITHUB_OUTPUT"
 
-      - name: Build devcontainer and run suite inside it
+      - name: Build devcontainer (cached) and run suite inside it
         uses: devcontainers/ci@v0.3
         with:
-          push: never
+          imageName: ${{ env.IMAGE }}
+          cacheFrom: ${{ env.IMAGE }}
+          # main / manual runs push the freshly built image to warm the cache for
+          # later PRs; PR runs only pull the cache and never push.
+          push: ${{ github.event_name == 'pull_request' && 'never' || 'always' }}
           # Runs after the image is built and postCreateCommand has completed
           # (deps installed). Times each phase and writes seconds to a workspace
           # file the host reads back for the summary.
