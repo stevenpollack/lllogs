@@ -62,10 +62,15 @@ container boundary, not from restricting Claude. `postCreateCommand` writes a
 **container-scoped** `~/.claude/settings.json`:
 
 ```json
-{ "permissions": { "defaultMode": "bypassPermissions" } }
+{
+  "permissions": { "defaultMode": "bypassPermissions" },
+  "skipDangerousModePermissionPrompt": true
+}
 ```
 
-so `claude` runs with permissions bypassed by default inside the container. This
+so `claude` runs with permissions bypassed by default inside the container
+(`skipDangerousModePermissionPrompt` pre-accepts the one-time dialog so a
+headless subagent doesn't block on it at startup). This
 lives in the container's home dir only — it is **not** the project's checked-in
 `.claude/settings.json`, so the host is unaffected. (You can still invoke
 explicitly with `claude --dangerously-skip-permissions`.)

@@ -4,8 +4,9 @@
 #   The project runtime is Bun and it must be pinned to the exact version the
 #   repo is developed against (1.3.14). The official Bun install script lets us
 #   pin deterministically; community Bun *features* lag releases and add a
-#   third-party registry dependency. Everything else (Node for the Claude Code
-#   CLI, gh) is layered cleanly via devcontainer `features` in devcontainer.json.
+#   third-party registry dependency. gh is layered via a devcontainer `feature`
+#   in devcontainer.json; the Claude Code CLI is installed via its native
+#   (no-Node) installer in post-create.sh — no Node runtime is installed.
 FROM mcr.microsoft.com/devcontainers/base:debian
 
 # Keep in sync with the project's developed-against Bun version.
