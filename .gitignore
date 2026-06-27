@@ -11,3 +11,9 @@ packages/web/test-results/
 
 # Agent isolation git worktrees (created by the WorktreeCreate hook) — transient.
 .claude/worktrees/
+
+# Devcontainer secret env (Claude credential + GH_TOKEN) — never commit; use .env.example.
+.devcontainer/.env
+
+# Timing artifact written into the workspace by the devcontainer CI workflow's runCmd.
+.ci-timing.env

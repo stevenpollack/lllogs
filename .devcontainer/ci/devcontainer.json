@@ -1,0 +1,25 @@
+{
+  // CI-only variant of the sandbox. The `devcontainers/ci` action bind-mounts
+  // the runner's CHECKOUT as the workspace, so this config deliberately has NO
+  // workspaceMount/onCreateCommand override — CI must test the PR's checked-out
+  // code, not a fresh clone of origin (and CI runners are disposable, so host
+  // isolation is moot here). The agent-facing config is ../devcontainer.json.
+  "name": "lllogs-ci",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // No --env-file here (CI has no secrets): tell post-create.sh's preflight to
+  // skip. containerEnv applies during `up`, so postCreateCommand sees it.
+  "containerEnv": {
+    "LLLOGS_SANDBOX_SKIP_SECRET_CHECK": "1"
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "vscode"
+}
