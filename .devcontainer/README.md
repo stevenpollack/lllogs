@@ -19,10 +19,17 @@ toolchain, and make commits, without touching the host filesystem or host
 
 ## Supplying the secrets
 
-The sandbox needs **two** secrets, both via env vars — the host `~/.claude` is
-**not** bind-mounted:
+The sandbox needs secrets via env vars — the host `~/.claude` is **not**
+bind-mounted:
 
-- `ANTHROPIC_API_KEY` — auth for the `claude` CLI.
+- **Claude auth — exactly one of:**
+  - `ANTHROPIC_API_KEY` — Console API key (pay-per-token), **or**
+  - `CLAUDE_CODE_OAUTH_TOKEN` — Pro/Max subscription token from `claude
+    setup-token` (run once on a machine with a browser; ~1-year token).
+
+  Set **only one**. `ANTHROPIC_API_KEY` outranks the OAuth token, so having both
+  lets a stale key silently override a valid subscription token — comment out the
+  line you're not using.
 - `GH_TOKEN` — auth for the `gh` CLI so the agent can open PRs. Use a
   **fine-grained PAT** scoped to only the repo(s) the sandbox should touch
   (Contents + Pull requests, read/write), with a short expiry — a broad classic
@@ -30,15 +37,16 @@ The sandbox needs **two** secrets, both via env vars — the host `~/.claude` is
 
 ```bash
 cp .devcontainer/.env.example .devcontainer/.env
-# edit .devcontainer/.env and fill in ANTHROPIC_API_KEY and GH_TOKEN
+# edit .devcontainer/.env: one Claude credential + GH_TOKEN
 ```
 
 `devcontainer.json` loads this file with `--env-file`, so the values are injected
 at run time. `.devcontainer/.env` is gitignored and never baked into an image
 layer. Two fail-fast guards: **the container won't start if `.devcontainer/.env`
-is missing** (Docker's `--env-file`), and **`post-create.sh` aborts if either
-secret is empty** — so a half-filled `.env` fails loudly at create time instead
-of mid-task. (CI builds with no real secrets and sets
+is missing** (Docker's `--env-file`), and **`post-create.sh` aborts unless
+exactly one Claude credential and `GH_TOKEN` are set** — so a half-filled or
+double-set `.env` fails loudly at create time instead of mid-task. (CI builds
+with no real secrets and sets
 `LLLOGS_SANDBOX_SKIP_SECRET_CHECK=1` to bypass the preflight.)
 
 ## Opening the container
