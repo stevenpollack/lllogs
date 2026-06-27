@@ -11,3 +11,6 @@ packages/web/test-results/
 
 # Agent isolation git worktrees (created by the WorktreeCreate hook) — transient.
 .claude/worktrees/
+
+# Devcontainer secret env (holds ANTHROPIC_API_KEY) — never commit; use .env.example.
+.devcontainer/.env

@@ -1,0 +1,32 @@
+{
+  "name": "lllogs-sandbox",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  // github-cli: gh, so subagents can open PRs / interact with GitHub.
+  // git comes from the base image; Bun is pinned in the Dockerfile; the Claude
+  // Code CLI is installed via its native installer in post-create.sh (no Node —
+  // the whole project runs on Bun).
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // ANTHROPIC_API_KEY is supplied at run time from a gitignored env file
+  // (.devcontainer/.env, copied from .env.example). Using --env-file keeps the
+  // key out of the image and out of git; it is never baked into a layer.
+  "runArgs": ["--env-file", "${localWorkspaceFolder}/.devcontainer/.env"],
+
+  // Installs project deps (Bun), the Claude Code CLI, and writes a
+  // container-scoped Claude settings.json that bypasses permissions by default.
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["oven.bun-vscode"]
+    }
+  },
+
+  // Default to the non-root user that owns the Bun install.
+  "remoteUser": "vscode"
+}
