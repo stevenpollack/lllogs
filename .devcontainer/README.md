@@ -5,6 +5,30 @@ subagents** a protected place to do development work: edit code, run the Bun
 toolchain, and make commits, without touching the host filesystem or host
 `~/.claude`.
 
+## Host isolation
+
+The workspace is a **named Docker volume**, not a bind mount of your checkout
+(`workspaceMount … type=volume` in `devcontainer.json`). **The host filesystem
+is never mounted**, so an agent running inside — even with permissions bypassed —
+cannot read, modify, or **delete** any file on your machine. The only host
+interaction is `--env-file` reading `.devcontainer/.env` at launch to inject
+secrets as env vars (it mounts nothing).
+
+Consequences of this model:
+
+- On first launch, `onCreateCommand` **clones `origin` into the volume** (via
+  `gh`, using `GH_TOKEN`). The agent's input is origin's state, **not** your
+  local uncommitted working tree.
+- The agent's work leaves the sandbox **only via pushed branches / PRs** — there
+  is no shared directory to write results back to the host.
+- The volume persists across container rebuilds; remove it with
+  `docker volume rm lllogs-sandbox-src` to start clean.
+
+CI is the exception: `.github/workflows/devcontainer.yml` uses the CI-variant
+config (`.devcontainer/ci/devcontainer.json`), which bind-mounts the runner's
+checkout so it tests the PR's actual code. CI runners are disposable, so host
+isolation is moot there.
+
 ## What's inside
 
 - **Base:** `mcr.microsoft.com/devcontainers/base:debian`.
@@ -45,15 +69,18 @@ at run time. `.devcontainer/.env` is gitignored and never baked into an image
 layer. Two fail-fast guards: **the container won't start if `.devcontainer/.env`
 is missing** (Docker's `--env-file`), and **`post-create.sh` aborts unless
 exactly one Claude credential and `GH_TOKEN` are set** — so a half-filled or
-double-set `.env` fails loudly at create time instead of mid-task. (CI builds
-with no real secrets and sets
-`LLLOGS_SANDBOX_SKIP_SECRET_CHECK=1` to bypass the preflight.)
+double-set `.env` fails loudly at create time instead of mid-task. (The CI
+variant has no secrets and no `--env-file`; it sets
+`LLLOGS_SANDBOX_SKIP_SECRET_CHECK=1` via `containerEnv` to bypass the preflight.)
 
 ## Opening the container
 
 - VS Code: "Dev Containers: Reopen in Container".
 - CLI: `devcontainer up --workspace-folder .` (or `devcontainer build` to just
   build the image).
+
+On first launch the empty volume is populated by cloning `origin` (see **Host
+isolation**); your host checkout is read for config/secrets but never mounted.
 
 ## Permission bypass (the container is the sandbox)
 

@@ -4,21 +4,34 @@
     "dockerfile": "Dockerfile"
   },
 
-  // github-cli: gh, so subagents can open PRs / interact with GitHub.
-  // git comes from the base image; Bun is pinned in the Dockerfile; the Claude
-  // Code CLI is installed via its native installer in post-create.sh (no Node —
-  // the whole project runs on Bun).
+  // --- Host isolation (the whole point of this sandbox) ---
+  // The workspace is a named Docker VOLUME, not a bind mount of your checkout.
+  // The host filesystem is never mounted, so an agent inside the container
+  // cannot read, modify, or DELETE any host file. onCreateCommand clones the
+  // repo from origin into the empty volume; the agent's work leaves only via
+  // pushed branches / PRs (it has GH_TOKEN). See README "Host isolation".
+  "workspaceMount": "source=lllogs-sandbox-src,target=/workspaces/lllogs,type=volume",
+  "workspaceFolder": "/workspaces/lllogs",
+
+  // github-cli: gh, so subagents can clone + open PRs. git comes from the base
+  // image; Bun is pinned in the Dockerfile; the Claude Code CLI is installed via
+  // its native installer in post-create.sh (no Node — the project runs on Bun).
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
 
-  // ANTHROPIC_API_KEY is supplied at run time from a gitignored env file
-  // (.devcontainer/.env, copied from .env.example). Using --env-file keeps the
-  // key out of the image and out of git; it is never baked into a layer.
+  // Secrets are READ from the host's gitignored .env at `docker run` time and
+  // injected as env vars — this mounts nothing, so the container gets the values
+  // but not the file (.env stays on the host, unreachable from inside).
   "runArgs": ["--env-file", "${localWorkspaceFolder}/.devcontainer/.env"],
 
-  // Installs project deps (Bun), the Claude Code CLI, and writes a
-  // container-scoped Claude settings.json that bypasses permissions by default.
+  // The named volume is empty + root-owned on first create: take ownership, then
+  // clone origin into it. Idempotent — skipped if the volume already holds a
+  // clone (e.g. a rebuild that reuses the volume). gh uses GH_TOKEN from the env.
+  "onCreateCommand": "sudo chown -R vscode:vscode /workspaces/lllogs && { [ -e /workspaces/lllogs/.git ] || gh repo clone stevenpollack/lllogs /workspaces/lllogs; }",
+
+  // Installs project deps (Bun), the Claude Code CLI, and the container-scoped
+  // bypass-permissions settings — all inside the cloned volume.
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
   // Default to the non-root user that owns the Bun install.

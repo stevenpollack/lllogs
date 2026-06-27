@@ -1,6 +1,8 @@
 # Builds the devcontainer and runs the test suite INSIDE it — validating the
 # exact environment future subagents use (Dockerfile, Bun pin, gh feature,
-# postCreate: bun install + Claude install + settings).
+# postCreate: bun install + Claude install + settings). Uses the CI-variant
+# config (.devcontainer/ci/) which bind-mounts the checked-out PR code; the
+# agent-facing config (.devcontainer/devcontainer.json) isolates via a volume.
 #
 # Caching: main/manual runs build the image and push it to GHCR (push: always),
 # warming a layer cache; PR runs pull it via cacheFrom and only build the delta
@@ -44,12 +46,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # devcontainer.json wires secrets via `docker run --env-file`, which is a
-      # HARD error if the file is missing. check/test need no real secrets, so
-      # stub an empty file and tell post-create.sh to skip its secret preflight.
-      - name: Stub .env (--env-file requires the file; skip the secret preflight)
-        run: printf 'ANTHROPIC_API_KEY=\nGH_TOKEN=\nLLLOGS_SANDBOX_SKIP_SECRET_CHECK=1\n' > .devcontainer/.env
-
       - name: Record start (build + postCreate + suite)
         id: t0
         run: echo "epoch=$(date +%s)" >> "$GITHUB_OUTPUT"
@@ -57,6 +53,9 @@ jobs:
       - name: Build devcontainer (cached) and run suite inside it
         uses: devcontainers/ci@v0.3
         with:
+          # CI variant: bind-mounts the checkout (tests PR code), skips the
+          # secret preflight. The agent-facing config is the isolated volume one.
+          configFile: .devcontainer/ci/devcontainer.json
           imageName: ${{ env.IMAGE }}
           cacheFrom: ${{ env.IMAGE }}
           # main / manual runs push the freshly built image to warm the cache for
