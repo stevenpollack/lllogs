@@ -4,6 +4,22 @@ set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || echo "${PWD}")"
 
+# 0. Preflight: the sandbox is useless without its secrets, so fail fast (before
+#    the slow installs) instead of letting the agent hit a 401 mid-task. Both
+#    come from .devcontainer/.env via --env-file; see .env.example. CI builds the
+#    image with no real secrets (it only runs check/test), so it sets
+#    LLLOGS_SANDBOX_SKIP_SECRET_CHECK=1 in the stub .env to skip this.
+if [ "${LLLOGS_SANDBOX_SKIP_SECRET_CHECK:-}" != "1" ]; then
+  missing=()
+  [ -n "${ANTHROPIC_API_KEY:-}" ] || missing+=(ANTHROPIC_API_KEY)
+  [ -n "${GH_TOKEN:-}" ] || missing+=(GH_TOKEN)
+  if [ "${#missing[@]}" -gt 0 ]; then
+    echo "ERROR: missing required secret(s): ${missing[*]}" >&2
+    echo "Set them in .devcontainer/.env (copy .devcontainer/.env.example), then rebuild." >&2
+    exit 1
+  fi
+fi
+
 # 1. Project dependencies — exact, reproducible install from bun.lock.
 bun install --frozen-lockfile
 

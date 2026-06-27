@@ -43,11 +43,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # devcontainer.json wires the key via `docker run --env-file`, which is a
-      # HARD error if the file is missing. check/test need no real key, so stub
-      # an empty one; the real key only matters for `claude` itself.
-      - name: Stub .env (--env-file requires the file to exist)
-        run: echo "ANTHROPIC_API_KEY=" > .devcontainer/.env
+      # devcontainer.json wires secrets via `docker run --env-file`, which is a
+      # HARD error if the file is missing. check/test need no real secrets, so
+      # stub an empty file and tell post-create.sh to skip its secret preflight.
+      - name: Stub .env (--env-file requires the file; skip the secret preflight)
+        run: printf 'ANTHROPIC_API_KEY=\nGH_TOKEN=\nLLLOGS_SANDBOX_SKIP_SECRET_CHECK=1\n' > .devcontainer/.env
 
       - name: Record start (build + postCreate + suite)
         id: t0
