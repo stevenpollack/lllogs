@@ -1,6 +1,6 @@
 import React from "react";
-import type { Facets, EventFilter } from "@clogdy/shared";
-import { asArray } from "@clogdy/shared";
+import type { Facets, EventFilter } from "@lllogs/shared";
+import { asArray } from "@lllogs/shared";
 import { usePersistedState } from "../usePersistedState";
 
 type FacetDim = keyof Facets;
@@ -17,7 +17,7 @@ function shortSession(s: string): string {
 
 // Persist which sections are collapsed so e.g. a long PROJECT list can be folded
 // away to reach KIND/TOOL, and stays that way across reloads.
-const COLLAPSE_KEY = "clogdy.facetCollapsed.v1";
+const COLLAPSE_KEY = "lllogs.facetCollapsed.v1";
 
 interface FacetSidebarProps {
   facets: Facets;

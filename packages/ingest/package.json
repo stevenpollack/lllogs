@@ -1,5 +1,5 @@
 {
-  "name": "@clogdy/ingest",
+  "name": "@lllogs/ingest",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@clogdy/shared": "file:../shared",
+    "@lllogs/shared": "file:../shared",
     "pino": "^10.3.1"
   },
   "devDependencies": {

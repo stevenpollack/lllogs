@@ -1,4 +1,4 @@
-# TUI evidence (`@clogdy/tui-v2`)
+# TUI evidence (`@lllogs/tui`)
 
 Text-frame snapshots of each view, captured from a **synthetic fixture** (no real
 transcript data) via `ink-testing-library`. Text frames are the terminal analog
@@ -20,7 +20,7 @@ open/raw/correlate) plus the pure-logic units.
 
 ## Recorded GIFs (VHS)
 
-`tapes/*.tape` render animated GIFs + PNGs of the **real** `v2:tui` binary in a
+`tapes/*.tape` render animated GIFs + PNGs of the **real** `tui` binary in a
 pseudo-terminal — the terminal analog of the web's recorded Playwright video.
 They need [charmbracelet/vhs](https://github.com/charmbracelet/vhs) (+ `ttyd`)
 installed, and a populated DB (`bun start` once). From the repo root:

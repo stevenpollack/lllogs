@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { asArray, type EventFilter } from "@clogdy/shared";
+import { asArray, type EventFilter } from "@lllogs/shared";
 import { toggleFilterValue, describeFilter } from "./filters";
 
 describe("toggleFilterValue", () => {

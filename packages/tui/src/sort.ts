@@ -1,4 +1,4 @@
-import type { EventRow } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
 import type { ColumnDef } from "./columns";
 
 export interface SortSpec {

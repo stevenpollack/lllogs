@@ -3,13 +3,13 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { ingestFixture, transcriptLine } from "@clogdy/shared/testing";
+import { ingestFixture, transcriptLine } from "@lllogs/shared/testing";
 import { createApp } from "./app";
 
 // GROUND RULE #3: this test process links SQLite ONLY via the server's bun:sqlite
 // (createApp's read-only Database). DuckDB is never imported here — it runs solely
 // as the CHILD process /api/stats spawns (the analytics CLI). We do NOT import
-// @duckdb/node-api or @clogdy/analytics. The fixture DB is built by SPAWNING the
+// @duckdb/node-api or @lllogs/analytics. The fixture DB is built by SPAWNING the
 // ingest CLI in a SEPARATE process (D-3.b), so even the fixture build never
 // double-links SQLite in this process.
 
@@ -101,7 +101,7 @@ let db: Database;
 let app: ReturnType<typeof createApp>;
 
 beforeAll(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), "clogdy-e2e-stats-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "lllogs-e2e-stats-"));
   const tree = join(tmpDir, "tree");
   const projDir = join(tree, "project-slug");
   mkdirSync(projDir, { recursive: true });

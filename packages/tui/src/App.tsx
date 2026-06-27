@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Text, useApp, useInput, useStdout } from "ink";
-import type { EventFilter, EventRow, Facets } from "@clogdy/shared";
+import type { EventFilter, EventRow, Facets } from "@lllogs/shared";
 import type { DataSource } from "./datasource";
 import { ALL_COLUMNS, DEFAULT_VISIBLE, columnById, type ColumnDef } from "./columns";
 import { EventTable } from "./components/EventTable";
@@ -275,7 +275,7 @@ export function App({
   const now = Date.now();
   const recent5m = tail.rows.reduce((n, r) => (now - r.ts < 300_000 ? n + 1 : n), 0);
   const status =
-    `clogdy ▸ ${live ? "LIVE ●" : "paused ‖"} · ${recent5m}/5m` +
+    `lllogs ▸ ${live ? "LIVE ●" : "paused ‖"} · ${recent5m}/5m` +
     (tail.newCount ? ` · ↓ ${tail.newCount} new` : "") +
     sortLabel +
     (chips ? ` · ${chips}` : "");

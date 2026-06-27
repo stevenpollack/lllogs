@@ -6,14 +6,14 @@
  * in a separate process (D-3.b). Fixture lines end with \n (D-3.e).
  *
  * Fixture design (hand-computed; kept deterministic):
- *   Project "projA" (basename of cwd = /tmp/clogdy-e2e-q/<run>/projA):
+ *   Project "projA" (basename of cwd = /tmp/lllogs-e2e-q/<run>/projA):
  *     - 3 Bash tool_use  (bash-1, bash-2, bash-3)
  *     - 3 Bash tool_result  (bash-1: ok, bash-2: ok, bash-3: ERROR ← required error)
  *     - 1 Read tool_use   (read-1)
  *     - 1 Read tool_result  (read-1: ok)
  *   = 8 events
  *
- *   Project "projB" (cwd = /tmp/clogdy-e2e-q/<run>/projB):
+ *   Project "projB" (cwd = /tmp/lllogs-e2e-q/<run>/projB):
  *     - 2 Edit tool_use  (edit-1, edit-2)
  *     - 2 Edit tool_result  (both ok)
  *   = 4 events
@@ -38,7 +38,7 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { ingestFixture, transcriptLine as line } from "@clogdy/shared/testing";
+import { ingestFixture, transcriptLine as line } from "@lllogs/shared/testing";
 import { createApp } from "./app";
 
 const REPO_ROOT = resolve(import.meta.dir, "../../..");
@@ -209,7 +209,7 @@ let db: Database;
 let app: ReturnType<typeof createApp>;
 
 beforeAll(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), "clogdy-e2e-q-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "lllogs-e2e-q-"));
 
   // Cwd paths: basename → project name in DB.
   cwdA = join(tmpDir, "projA");

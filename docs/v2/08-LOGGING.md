@@ -1,29 +1,29 @@
 # Structured logging — the evidence layer
 
-clogdy v2 emits **one structured JSONL schema across every process** so a reviewer (or a Playwright
+lllogs v2 emits **one structured JSONL schema across every process** so a reviewer (or a Playwright
 assertion) can read what the server / analytics child / browser actually *did* and confirm correctness
 from the logs, not just the DOM. Implemented with **pino** in sync-fd mode (node) and `pino/browser`
-(web) — no worker-thread transports. This is the "evidence layer"; the friendly `clogdy ▸` /
+(web) — no worker-thread transports. This is the "evidence layer"; the friendly `lllogs ▸` /
 `→ http://localhost` banners stay the "UX layer".
 
 ## Architecture — process → sink → level
 
-| proc | sink (default) | sink (`CLOGDY_LOG_DIR` set) |
+| proc | sink (default) | sink (`LLLOGS_LOG_DIR` set) |
 | --- | --- | --- |
 | `server` | stderr (fd 2) | `<dir>/server.jsonl` |
 | `ingest` | stderr (fd 2) | `<dir>/ingest.jsonl` |
 | `analytics` | **silent** | `<dir>/analytics-<pid>.jsonl` (per-pid: spawned per request, concurrent) |
 | `web` | `console.log` | n/a — Playwright captures it via `page.on("console")` + trace |
 
-**Node sink** — `nodeLogger(proc)` from the **`@clogdy/shared/node`** subpath (NOT the barrel — it
+**Node sink** — `nodeLogger(proc)` from the **`@lllogs/shared/node`** subpath (NOT the barrel — it
 touches `fs`/`process`/`pino` and must never enter the browser bundle). Writes
-`<CLOGDY_LOG_DIR>/<proc>[-<pid>].jsonl` with `pino.destination({ sync: true })`, so a line is on disk the
+`<LLLOGS_LOG_DIR>/<proc>[-<pid>].jsonl` with `pino.destination({ sync: true })`, so a line is on disk the
 moment a request resolves — a spec can read it immediately with no flush race.
 
 **Browser sink** — `packages/web/src/log.ts` (`pino/browser`). pino/browser ignores
 `formatters`/`timestamp`/`base`, so a `write` hook re-shapes each record to the node schema (ISO `ts`,
 string `level`, `proc:"web"`) and emits a **pure JSON line** via `console.log`. Level resolves from the
-**`?log=`** query param → `localStorage["clogdy:log"]` → default `warn`. Navigate with **`/?log=debug`**
+**`?log=`** query param → `localStorage["lllogs:log"]` → default `warn`. Navigate with **`/?log=debug`**
 to capture client debug events.
 
 ### The stdout / stderr / file wire rules (do not break)
@@ -31,16 +31,16 @@ to capture client debug events.
 1. **Analytics stdout is the data wire** — the server does `JSON.parse(stdout)` over the child's output.
    A stray byte corrupts it, so the analytics logger **never** writes stdout (fd 1).
 2. **Analytics stderr is the error wire** — on non-zero exit the server forwards `stderr.trim()` to the
-   user. So analytics logs go to a **file only**; without `CLOGDY_LOG_DIR` analytics is **silent** (its
+   user. So analytics logs go to a **file only**; without `LLLOGS_LOG_DIR` analytics is **silent** (its
    destination is pinned to fd 2 and forced `silent`, so it can never reach fd 1 even if misused).
-3. **Browser-bundle purity** — the node sink lives behind `@clogdy/shared/node`; the web import graph
+3. **Browser-bundle purity** — the node sink lives behind `@lllogs/shared/node`; the web import graph
    never pulls in `pino`'s node build / `fs` / `process`.
 
 ### Env
 
-- **`CLOGDY_LOG_LEVEL`** = `silent|error|warn|info|debug` (default `info`; an unknown value does not
+- **`LLLOGS_LOG_LEVEL`** = `silent|error|warn|info|debug` (default `info`; an unknown value does not
   throw — it falls back to `info`/`warn`). `bun start` stays quiet at `info`; Playwright/CI run `debug`.
-- **`CLOGDY_LOG_DIR`** = a directory; each process writes its own `<proc>[-<pid>].jsonl`. Every
+- **`LLLOGS_LOG_DIR`** = a directory; each process writes its own `<proc>[-<pid>].jsonl`. Every
   `Bun.spawn` inherits `process.env`, so a server started with these two vars set propagates them to the
   analytics children automatically.
 
@@ -62,7 +62,7 @@ middleware mints a per-request **`reqId`** and binds it on a `log.child`, so eve
 (`req.start` → `analytics.spawn` → `analytics.exit` → `req.end`) shares it. `base:{proc,pid}` *replaces*
 pino's default `{pid,hostname}`, so committed artifacts leak **no hostname**.
 
-Two pure helpers ship in the **`@clogdy/shared`** barrel (`packages/shared/src/log.ts`), used by both
+Two pure helpers ship in the **`@lllogs/shared`** barrel (`packages/shared/src/log.ts`), used by both
 `bun:test` and Playwright:
 
 - `parseLogLines(text): LogEntry[]` — split on `\n`, `JSON.parse` each, skip blank / non-JSON lines (a
@@ -74,9 +74,9 @@ Two pure helpers ship in the **`@clogdy/shared`** barrel (`packages/shared/src/l
 `packages/web/e2e/logging.pw.ts` is the **log-as-proof** spec. It drives the real UI over a fixture DB,
 then asserts the server, the analytics child, and the browser logs line up.
 
-**Wiring (`packages/web/playwright.config.ts`):** `webServer.env` adds `CLOGDY_LOG_DIR` +
-`CLOGDY_LOG_LEVEL: "debug"`. The path is defined once in **`e2e/logenv.ts`** as
-`packages/web/test-results/clogdy-logs/` — i.e. **under Playwright's `outputDir`**, on purpose (see the
+**Wiring (`packages/web/playwright.config.ts`):** `webServer.env` adds `LLLOGS_LOG_DIR` +
+`LLLOGS_LOG_LEVEL: "debug"`. The path is defined once in **`e2e/logenv.ts`** as
+`packages/web/test-results/lllogs-logs/` — i.e. **under Playwright's `outputDir`**, on purpose (see the
 lifecycle gotcha below). `SERVER_LOG = <LOG_DIR>/server.jsonl`.
 
 **What the spec captures and asserts:**
@@ -104,15 +104,15 @@ task, which wipes `outputDir` — hence `LOG_DIR` lives under it. `e2e/global-se
 with the ingest CLI** (a separate process — ground rule #3), then pointing the server at it:
 
 ```bash
-bun run v2:ingest -- --backfill --root <synthetic-tree> --db <fixture.db>
-# then the Playwright webServer runs:  CLOGDY_DB=<fixture.db> bun run v2:serve
+bun run ingest -- --backfill --root <synthetic-tree> --db <fixture.db>
+# then the Playwright webServer runs:  LLLOGS_DB=<fixture.db> bun run serve
 ```
 
 Run the spec (the DuckDB child can take several seconds — keep generous timeouts):
 
 ```bash
 cd packages/web
-CLOGDY_FIXTURE_DB=<fixture.db> bunx playwright test logging.pw.ts
+LLLOGS_FIXTURE_DB=<fixture.db> bunx playwright test logging.pw.ts
 ```
 
 **Artifacts:**

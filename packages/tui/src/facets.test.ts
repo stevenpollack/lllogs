@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import type { Facets } from "@clogdy/shared";
+import type { Facets } from "@lllogs/shared";
 import { buildFacetItems } from "./facets";
 
 const facets: Facets = {
   project: [
-    { value: "clogdy", count: 10 },
+    { value: "lllogs", count: 10 },
     { value: "web", count: 3 },
   ],
   session: [],
@@ -20,7 +20,7 @@ const facets: Facets = {
 test("flattens dims in order, marking selected values", () => {
   const items = buildFacetItems(facets, { tool: "Bash", project: ["web"] });
   expect(items.map((i) => `${i.dim}:${i.value}`)).toEqual([
-    "project:clogdy",
+    "project:lllogs",
     "project:web",
     "tool:Bash",
     "error:ok",
@@ -28,7 +28,7 @@ test("flattens dims in order, marking selected values", () => {
   ]);
   expect(items.find((i) => i.value === "web")!.selected).toBe(true);
   expect(items.find((i) => i.value === "Bash")!.selected).toBe(true);
-  expect(items.find((i) => i.value === "clogdy")!.selected).toBe(false);
+  expect(items.find((i) => i.value === "lllogs")!.selected).toBe(false);
 });
 
 test("empty facets → empty list", () => {

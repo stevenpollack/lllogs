@@ -1,15 +1,15 @@
 #!/usr/bin/env bun
 /**
- * clogdy v2 live-monitor TUI entry point (`bun run v2:tui`).
+ * lllogs v2 live-monitor TUI entry point (`bun run tui`).
  *
  * Co-located, zero-network design: opens the SQLite store READ-ONLY via
  * bun:sqlite and renders the Ink app. By default it also spawns the ingester
- * (`v2:ingest --watch`) as the single writer so a bare `v2:tui` is self-contained
+ * (`ingest --watch`) as the single writer so a bare `tui` is self-contained
  * — run it over SSH / `docker exec` on the box where the transcripts live.
  *
  * The TUI process loads only bun:sqlite (never DuckDB/Hono), so it can read the
  * live WAL DB while the ingester writes (ground rules #3/#5/#9). The spawned
- * ingester's logs are redirected to a file (CLOGDY_LOG_DIR) AND its stderr is
+ * ingester's logs are redirected to a file (LLLOGS_LOG_DIR) AND its stderr is
  * dropped, so its pino output can never corrupt the Ink screen.
  */
 import { render } from "ink";
@@ -17,7 +17,7 @@ import { Database } from "bun:sqlite";
 import { existsSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { resolvePaths } from "@clogdy/shared";
+import { resolvePaths } from "@lllogs/shared";
 import { App } from "./App";
 import { makeSqliteDataSource } from "./datasource";
 
@@ -40,11 +40,11 @@ function parseArgs(argv: string[]): Args {
   return out;
 }
 
-const HELP = `clogdy v2:tui — terminal live-monitor for Claude Code tool usage
+const HELP = `lllogs tui — terminal live-monitor for Claude Code tool usage
 
-Usage: bun run v2:tui [options]
+Usage: bun run tui [options]
 
-  --db <path>     SQLite store (default: $CLOGDY_DB or XDG data dir)
+  --db <path>     SQLite store (default: $LLLOGS_DB or XDG data dir)
   --root <path>   transcripts root to ingest (default: ~/.claude/projects)
   --no-ingest     don't spawn the ingester (attach to an externally-managed one,
                   e.g. when \`bun start\` is already running on the same DB)
@@ -61,16 +61,16 @@ if (args.help) {
 }
 
 const paths = resolvePaths({ db: args.db, root: args.root });
-// packages/tui/src → repo root (where the v2:ingest script lives).
+// packages/tui/src → repo root (where the ingest script lives).
 const repoRoot = resolve(import.meta.dir, "..", "..", "..");
 
 let ingester: ReturnType<typeof Bun.spawn> | null = null;
 if (!args.noIngest) {
   // Send the writer's structured logs to a file and drop its stderr, so nothing
-  // it emits reaches the Ink TTY. CLOGDY_LOG_DIR propagates to the child via env.
-  const logDir = join(tmpdir(), "clogdy-tui");
+  // it emits reaches the Ink TTY. LLLOGS_LOG_DIR propagates to the child via env.
+  const logDir = join(tmpdir(), "lllogs-tui");
   mkdirSync(logDir, { recursive: true });
-  const ingestArgs = ["bun", "run", "v2:ingest", "--", "--watch"];
+  const ingestArgs = ["bun", "run", "ingest", "--", "--watch"];
   if (args.db) ingestArgs.push("--db", args.db);
   if (args.root) ingestArgs.push("--root", args.root);
   ingester = Bun.spawn(ingestArgs, {
@@ -78,7 +78,7 @@ if (!args.noIngest) {
     stdin: "ignore",
     stdout: "ignore",
     stderr: "ignore",
-    env: { ...process.env, CLOGDY_LOG_DIR: logDir },
+    env: { ...process.env, LLLOGS_LOG_DIR: logDir },
   });
 
   // The ingester's openDb creates + migrates the DB on startup; wait for the file
@@ -89,9 +89,9 @@ if (!args.noIngest) {
 
 if (!existsSync(paths.db)) {
   process.stderr.write(
-    `clogdy tui: no database at ${paths.db}\n` +
+    `lllogs tui: no database at ${paths.db}\n` +
       (args.noIngest
-        ? "Run the ingester first:  bun run v2:ingest -- --backfill\n"
+        ? "Run the ingester first:  bun run ingest -- --backfill\n"
         : "The ingester did not create it within 10s — check bun/permissions.\n"),
   );
   ingester?.kill();
@@ -112,8 +112,8 @@ const tableReady = (): boolean =>
 }
 if (!tableReady()) {
   process.stderr.write(
-    `clogdy tui: database at ${paths.db} has no 'event' table.\n` +
-      "Run the ingester first:  bun run v2:ingest -- --backfill\n",
+    `lllogs tui: database at ${paths.db} has no 'event' table.\n` +
+      "Run the ingester first:  bun run ingest -- --backfill\n",
   );
   ingester?.kill();
   db.close();

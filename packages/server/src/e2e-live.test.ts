@@ -14,7 +14,7 @@ import { Database } from "bun:sqlite";
 import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { openDb, runIngest } from "@clogdy/ingest";
+import { openDb, runIngest } from "@lllogs/ingest";
 import { maxEventId } from "./queries";
 import { pollNewEvents } from "./app";
 
@@ -147,9 +147,9 @@ test("e2e live: watch ingest delivers appended tool_use+tool_result with corr pa
 
   try {
     // 1. Scaffold temp tree.
-    dir = mkdtempSync(join(tmpdir(), "clogdy-e2e-live-"));
+    dir = mkdtempSync(join(tmpdir(), "lllogs-e2e-live-"));
     const root = join(dir, "projects");
-    const dbPath = join(dir, "db", "clogdy.db");
+    const dbPath = join(dir, "db", "lllogs.db");
 
     // Create one project dir + one existing session file with a prompt line
     // (so the initial backfill has something to chew on and the file exists to append to).

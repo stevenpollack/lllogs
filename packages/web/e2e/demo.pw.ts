@@ -1,14 +1,14 @@
 import { test, expect } from "@playwright/test";
 
 // Demo walkthrough — records a video of the whole app on the 56k-event corpus.
-// Run with CLOGDY_FIXTURE_DB pointed at the big demo DB:
-//   CLOGDY_FIXTURE_DB=/…/scratchpad/demo.db bunx playwright test demo
+// Run with LLLOGS_FIXTURE_DB pointed at the big demo DB:
+//   LLLOGS_FIXTURE_DB=/…/scratchpad/demo.db bunx playwright test demo
 // The resulting test-results/…/video.webm is copied into docs/v2/artifacts/phase5/.
 // Deliberate pauses make it watchable; `.pw.ts` so `bun test` ignores it (D-5.i).
 
 const beat = (page: import("@playwright/test").Page, ms = 1100) => page.waitForTimeout(ms);
 
-test("clogdy v2 demo: events → virtualization → facets → drawer → analytics → SQL", async ({
+test("lllogs v2 demo: events → virtualization → facets → drawer → analytics → SQL", async ({
   page,
 }) => {
   test.setTimeout(120_000);

@@ -1,6 +1,6 @@
 import type { Database } from "bun:sqlite";
-import type { EventFilter, EventRow, Facets } from "@clogdy/shared";
-import { queryEvents, queryLatest, queryFacets, maxEventId } from "@clogdy/server/src/queries";
+import type { EventFilter, EventRow, Facets } from "@lllogs/shared";
+import { queryEvents, queryLatest, queryFacets, maxEventId } from "@lllogs/server/src/queries";
 
 /**
  * The data seam every Ink component depends on. Production wires it over a
@@ -21,8 +21,8 @@ export interface DataSource {
 /**
  * The production DataSource: thin adapters over the server's pure query
  * functions, bound to one read-only DB handle. Imports `queries.ts` directly
- * (NOT the `@clogdy/server` index, which pulls in Hono) — queries.ts only needs
- * `bun:sqlite` + `@clogdy/shared`, so DuckDB/Hono never enter this process.
+ * (NOT the `@lllogs/server` index, which pulls in Hono) — queries.ts only needs
+ * `bun:sqlite` + `@lllogs/shared`, so DuckDB/Hono never enter this process.
  */
 export function makeSqliteDataSource(db: Database): DataSource {
   return {

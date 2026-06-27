@@ -1,5 +1,5 @@
 {
-  "name": "@clogdy/web",
+  "name": "@lllogs/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@clogdy/shared": "file:../shared",
+    "@lllogs/shared": "file:../shared",
     "@codemirror/lang-sql": "^6.8.0",
     "@tanstack/react-table": "^8.20.0",
     "@tanstack/react-virtual": "^3.14.3",

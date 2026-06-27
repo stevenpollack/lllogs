@@ -2,8 +2,8 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { EventFilter } from "@clogdy/shared";
-import { ingestFixture, transcriptLine } from "@clogdy/shared/testing";
+import type { EventFilter } from "@lllogs/shared";
+import { ingestFixture, transcriptLine } from "@lllogs/shared/testing";
 import {
   buildWhere,
   errorRate,
@@ -36,7 +36,7 @@ describe("buildWhere multi-value (pure — no DuckDB)", () => {
 });
 
 // GROUND RULE #3: this file loads DuckDB. It MUST NOT import bun:sqlite or
-// @clogdy/ingest (double-linking SQLite in one process is forbidden). The
+// @lllogs/ingest (double-linking SQLite in one process is forbidden). The
 // fixture DB is built by SPAWNING the ingest CLI in a separate child process
 // (D-3.b), then DuckDB opens it READ_ONLY here — the only in-process SQLite
 // link is DuckDB's.
@@ -95,7 +95,7 @@ let tmpDir: string;
 let tmpDb: string;
 
 beforeAll(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), "clogdy-duck-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "lllogs-duck-"));
   const tree = join(tmpDir, "tree");
   const projDir = join(tree, "project-slug");
   mkdirSync(projDir, { recursive: true });

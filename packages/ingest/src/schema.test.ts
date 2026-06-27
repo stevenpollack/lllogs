@@ -1,9 +1,9 @@
 import { test, expect } from "bun:test";
-import { SQL_COLUMNS } from "@clogdy/shared";
+import { SQL_COLUMNS } from "@lllogs/shared";
 import { SCHEMA_SQL } from "./schema";
 
 // Drift guard: the SQL editor's column reference / autocomplete is driven by
-// SQL_COLUMNS in @clogdy/shared. Those names can't be derived from the DDL (it's
+// SQL_COLUMNS in @lllogs/shared. Those names can't be derived from the DDL (it's
 // a raw SQL string with no descriptions), so this test keeps the two in lockstep
 // — if a column is added/removed/renamed on the `event` table, this fails until
 // SQL_COLUMNS is updated to match.

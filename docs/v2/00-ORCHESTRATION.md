@@ -1,6 +1,6 @@
 # v2 Orchestration Plan — READ THIS FIRST
 
-You are an **Opus orchestrator**. Your job is to build **clogdy v2**: a local tool to
+You are an **Opus orchestrator**. Your job is to build **lllogs v2**: a local tool to
 **investigate past** and **monitor current** Claude Code tool usage, replacing the Logdy proof of
 concept. You will do this by spawning **Sonnet implementation subagents**, one task at a time per the
 DAG below, verifying each, and committing on green. **Do not write feature code yourself** — your role
@@ -56,34 +56,34 @@ you decide (and record the decision in `docs/v2/DECISIONS.md`, creating it if ab
   does NOT live-reflect source edits — a cross-package import of a just-added export fails with
   `SyntaxError: Export named 'X' not found` until you re-`bun install`. (Looks like a missing export; it
   isn't.)
-- **A package is only importable as `@clogdy/<name>` if its `package.json` declares an entry point.**
-  Packages imported by other packages (currently `@clogdy/shared`, `@clogdy/ingest`) MUST have
+- **A package is only importable as `@lllogs/<name>` if its `package.json` declares an entry point.**
+  Packages imported by other packages (currently `@lllogs/shared`, `@lllogs/ingest`) MUST have
   `"exports": { ".": "./src/index.ts" }` plus `"module"`/`"types"` pointing at `src/index.ts`. Relative
   intra-package imports work without it, which is why a package can pass its own tests yet be unusable
-  cross-package — verify with a real `import { X } from "@clogdy/shared"` from another package.
+  cross-package — verify with a real `import { X } from "@lllogs/shared"` from another package.
 - **`await res.json()` is typed `unknown` under strict TS.** `bun test` runs fine but `bun run check`
   (the gate) errors `TS18046`. In tests, cast: `const body = (await res.json()) as any`.
 
 ## Target layout (v2 packages added to the existing Bun-workspaces monorepo)
 
-The repo root is the `clogdy` (core) workspace; `tui/` is `@clogdy/tui`. Add these workspace packages
+The repo root is the `lllogs` (core) workspace; `tui/` is `@lllogs/tui`. Add these workspace packages
 (root `package.json` `workspaces` array gains each new dir):
 
 ```
 packages/
-  shared/      @clogdy/shared     — v2 shared TS types + the flatten port + small utils (NO sqlite/http)
-  ingest/      @clogdy/ingest     — tailer + sqlite writer + schema + CLI (bun:sqlite WRITER process)
-  server/      @clogdy/server     — Hono HTTP+SSE API + static web serving (bun:sqlite READER process)
-  analytics/   @clogdy/analytics  — DuckDB read-only query CLI (DuckDB-only process; shelled out by server)
-  web/         @clogdy/web         — browser SPA assets, bundled with Bun.build, served by @clogdy/server
+  shared/      @lllogs/shared     — v2 shared TS types + the flatten port + small utils (NO sqlite/http)
+  ingest/      @lllogs/ingest     — tailer + sqlite writer + schema + CLI (bun:sqlite WRITER process)
+  server/      @lllogs/server     — Hono HTTP+SSE API + static web serving (bun:sqlite READER process)
+  analytics/   @lllogs/analytics  — DuckDB read-only query CLI (DuckDB-only process; shelled out by server)
+  web/         @lllogs/web         — browser SPA assets, bundled with Bun.build, served by @lllogs/server
 ```
 
 > Why `packages/` (not root like v1's core): v2 is a clean multi-package app; nesting under `packages/`
 > keeps it visually separate from the v1 core that still lives at root. Root `package.json`
 > `workspaces` becomes `["tui", "packages/*"]`.
 
-Each new package depends on `@clogdy/shared` via `"@clogdy/shared": "file:../shared"` and on nothing
-from v1 core except by **porting** (copying + adapting) — no runtime import of `clogdy` (the Logdy core)
+Each new package depends on `@lllogs/shared` via `"@lllogs/shared": "file:../shared"` and on nothing
+from v1 core except by **porting** (copying + adapting) — no runtime import of `lllogs` (the Logdy core)
 from v2.
 
 ## The DAG (build order + parallelism)
@@ -95,17 +95,17 @@ tasks in a later PG of the same phase depend on earlier PGs of that phase.
 ```
 PHASE 0 — Scaffolding & contracts        (foundation; everything depends on it)
   T-0.1  monorepo scaffolding (packages, tsconfig, deps, workspaces)         [PG0, solo]
-  T-0.2  @clogdy/shared types + flatten port + tests                         [PG1]
-  T-0.3  data-dir + config resolution util (@clogdy/shared)                  [PG1]
+  T-0.2  @lllogs/shared types + flatten port + tests                         [PG1]
+  T-0.3  data-dir + config resolution util (@lllogs/shared)                  [PG1]
 
 PHASE 1 — MVP: investigate past, accurately
-  T-1.1  @clogdy/ingest: schema module + DB open/migrate                     [PG0]
-  T-1.2  @clogdy/ingest: tailer (port follow.ts) → callback sink             [PG0]
-  T-1.3  @clogdy/ingest: writer (batched INSERT OR IGNORE) + cursor          [PG1, needs 1.1]
-  T-1.4  @clogdy/ingest: backfill CLI wiring (tailer→flatten→writer)         [PG2, needs 1.2,1.3,0.2]
-  T-1.5  @clogdy/server: query layer (events + faceted counts) over bun:sqlite [PG1, needs 1.1]
-  T-1.6  @clogdy/server: Hono app /api/events /api/facets /healthz + static  [PG2, needs 1.5]
-  T-1.7  @clogdy/web: MVP table + facet sidebar (vanilla TS, Bun.build)       [PG2, needs 0.1; integrates 1.6 contract]
+  T-1.1  @lllogs/ingest: schema module + DB open/migrate                     [PG0]
+  T-1.2  @lllogs/ingest: tailer (port follow.ts) → callback sink             [PG0]
+  T-1.3  @lllogs/ingest: writer (batched INSERT OR IGNORE) + cursor          [PG1, needs 1.1]
+  T-1.4  @lllogs/ingest: backfill CLI wiring (tailer→flatten→writer)         [PG2, needs 1.2,1.3,0.2]
+  T-1.5  @lllogs/server: query layer (events + faceted counts) over bun:sqlite [PG1, needs 1.1]
+  T-1.6  @lllogs/server: Hono app /api/events /api/facets /healthz + static  [PG2, needs 1.5]
+  T-1.7  @lllogs/web: MVP table + facet sidebar (vanilla TS, Bun.build)       [PG2, needs 0.1; integrates 1.6 contract]
   T-1.8  end-to-end smoke: backfill a fixture tree → server → assert facets  [PG3, needs 1.4,1.6,1.7]
 
 PHASE 2 — Live monitor
@@ -115,7 +115,7 @@ PHASE 2 — Live monitor
   T-2.4  e2e: append to a live fixture, assert SSE delivers it               [PG2, needs 2.1,2.2]
 
 PHASE 3 — DuckDB analytics
-  T-3.1  @clogdy/analytics: DuckDB query CLI (read-only ATTACH) + queries    [PG0, needs 1.1]
+  T-3.1  @lllogs/analytics: DuckDB query CLI (read-only ATTACH) + queries    [PG0, needs 1.1]
   T-3.2  server: /api/stats proxy → spawn analytics CLI                      [PG1, needs 3.1,1.6]
   T-3.3  web: analytics view (latency p50/p95, error trends, rollups)        [PG2, needs 3.2,1.7]
   T-3.4  e2e: stats endpoint correctness vs known fixture                    [PG2, needs 3.2]
@@ -123,7 +123,7 @@ PHASE 3 — DuckDB analytics
 PHASE 4 — Polish & retire v1
   T-4.1  shared: render helpers port (command splitter, diff/result render)  [PG0, needs 0.2]
   T-4.2  web: rich rendering using 4.1 (composite cmd table, colored diff)   [PG1, needs 4.1,1.7]
-  T-4.3  tui integration: @clogdy/tui can launch v2 (server) for a selection [PG1, needs 1.6]
+  T-4.3  tui integration: @lllogs/tui can launch v2 (server) for a selection [PG1, needs 1.6]
   T-4.4  retire v1 (Logdy) — GATED on explicit user OK                       [PG2, needs parity]
 
 PHASE 5 — React/TanStack web + virtualization + facet/SQL query (UI phase; recorded Playwright evidence)
@@ -160,10 +160,10 @@ PHASE 5 — React/TanStack web + virtualization + facet/SQL query (UI phase; rec
 ### Subagent prompt template (fill the `<…>`)
 
 ```
-You are implementing ONE task in the clogdy v2 build. Do exactly what this spec says and nothing more.
+You are implementing ONE task in the lllogs v2 build. Do exactly what this spec says and nothing more.
 Make no architectural choices; everything is specified. Use Bun (never npm/node). Strict TypeScript.
 
-READ FIRST (required, in the repo at /home/steven/repos/clogdy):
+READ FIRST (required, in the repo at /home/steven/repos/lllogs):
 - docs/v2/00-ORCHESTRATION.md  → "Non-negotiable ground rules" (all 9) and "Target layout"
 - docs/v2/01-CONTRACTS.md      → the frozen types/schema/API your code must match EXACTLY
 - docs/v2/<PHASE FILE>          → your task: <T-ID> <title>
@@ -221,7 +221,7 @@ timeout fires (T-5.4, mirrors `/api/stats`); (3) virtualization bounds the DOM o
 
 Phase 0 — Scaffolding & contracts  ✅ built & on `v2` (de541b3)
 - [x] T-0.1 monorepo scaffolding
-- [x] T-0.2 @clogdy/shared types + flatten port
+- [x] T-0.2 @lllogs/shared types + flatten port
 - [x] T-0.3 config/data-dir util
 
 Phase 1 — MVP  ✅ built green (123 tests, e2e facets exact); harvested onto `v2`
@@ -266,10 +266,10 @@ Phase 5 — React/TanStack web + virtualization + facet/SQL query  ✅ built gre
 
 A user runs (from the repo root):
 ```
-bun run v2:ingest -- --backfill           # one-time: build the DB from ~/.claude/projects
-bun run v2:serve                          # starts the server; prints http://localhost:7331
+bun run ingest -- --backfill           # one-time: build the DB from ~/.claude/projects
+bun run serve                          # starts the server; prints http://localhost:7331
 # opens the URL: a filterable table over the FULL corpus, accurate facet counts, no 100-row cap;
 # a live tab that updates as Claude works; an analytics tab with per-tool/error/latency rollups.
-bun run v2:ingest -- --watch              # (separately) keeps the DB live
+bun run ingest -- --watch              # (separately) keeps the DB live
 ```
 All `bun run check` + `bun test` green; v1 still works until T-4.4 retires it.

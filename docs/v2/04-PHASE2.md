@@ -37,7 +37,7 @@ session file; after a short poll interval, assert the new events appear in `even
 Then signal shutdown; assert it flushed. (Use a timeout-bounded poll loop; keep it deterministic.)
 
 **Acceptance:** `bun test packages/ingest/src/watch.test.ts` green; `bun run check` green; manual:
-`bun run v2:ingest -- --watch` against real `~/.claude/projects` ingests new activity live (orchestrator
+`bun run ingest -- --watch` against real `~/.claude/projects` ingests new activity live (orchestrator
 spot-checks by triggering any Claude tool call in another session and watching the count rise).
 
 ---
@@ -90,7 +90,7 @@ Prefer the extracted-function approach for determinism.
   windowed queries (or add filter `since=Date.now()-5min`). Refresh tiles on each facet refresh and on
   live append (throttled ~1s).
 
-**Acceptance:** `bun run v2:web:build` ok; `bun run check` green; manual (orchestrator): with `--watch`
+**Acceptance:** `bun run web:build` ok; `bun run check` green; manual (orchestrator): with `--watch`
 running, the live toggle streams new rows in and tiles update.
 
 ---

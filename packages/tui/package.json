@@ -1,5 +1,5 @@
 {
-  "name": "@clogdy/tui-v2",
+  "name": "@lllogs/tui",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,8 +7,8 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@clogdy/server": "file:../server",
-    "@clogdy/shared": "file:../shared",
+    "@lllogs/server": "file:../server",
+    "@lllogs/shared": "file:../shared",
     "ink": "^7.1.0",
     "react": "^19.2.7"
   },

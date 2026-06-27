@@ -1,5 +1,5 @@
 {
-  "name": "@clogdy/analytics",
+  "name": "@lllogs/analytics",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@clogdy/shared": "file:../shared",
+    "@lllogs/shared": "file:../shared",
     "@duckdb/node-api": "1.4.5-r.1",
     "pino": "^10.3.1"
   },

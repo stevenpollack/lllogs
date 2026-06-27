@@ -1,4 +1,4 @@
-# clogdy
+# lllogs
 
 A local tool to **investigate past** and **monitor current** Claude Code tool usage — every `Bash`,
 `Edit`, `Read`, `WebFetch`, … call Claude makes, its result, latency, and the turn-by-turn flow — in a
@@ -46,26 +46,26 @@ Open <http://localhost:7331>. `bun start` is the one command you need: it builds
 missing, backfills the DB from `~/.claude/projects`, keeps tailing for new transcripts (live monitoring),
 and serves the app — then shuts everything down cleanly on Ctrl-C. Flags: `--dev` (rebuild the bundle on
 source changes — then refresh the browser), `--reset` (rebuild the DB), `--no-watch` (serve a static
-snapshot), `--build` (force-rebuild the bundle), `--help`. `bun run v2:dev` is shorthand for `--dev`.
+snapshot), `--build` (force-rebuild the bundle), `--help`. `bun run dev` is shorthand for `--dev`.
 
 <details>
 <summary>Run the stages individually</summary>
 
 ```bash
-bun run v2:ingest -- --backfill   # one-time: build the DB from ~/.claude/projects
-bun run v2:web:build              # bundle the React app (Bun.build → packages/web/dist)
-bun run v2:serve                  # start the server → http://localhost:7331
-bun run v2:ingest -- --watch      # (separate terminal) backfill, then tail continuously
+bun run ingest -- --backfill   # one-time: build the DB from ~/.claude/projects
+bun run web:build              # bundle the React app (Bun.build → packages/web/dist)
+bun run serve                  # start the server → http://localhost:7331
+bun run ingest -- --watch      # (separate terminal) backfill, then tail continuously
 ```
 
 </details>
 
 Paths and ports (override via env):
 
-- DB: `$XDG_DATA_HOME/clogdy/clogdy.db` (else `~/.local/share/clogdy/clogdy.db`) — `CLOGDY_DB`.
-- Transcript root: `~/.claude/projects` — `CLOGDY_ROOT` (or a positional arg to `v2:ingest`).
-- Server port: `7331` — `CLOGDY_PORT`.
-- Logging: `CLOGDY_LOG_LEVEL` (default `info`), `CLOGDY_LOG_DIR` (per-process JSONL files) — see [Logging](#logging) below.
+- DB: `$XDG_DATA_HOME/lllogs/lllogs.db` (else `~/.local/share/lllogs/lllogs.db`) — `LLLOGS_DB`.
+- Transcript root: `~/.claude/projects` — `LLLOGS_ROOT` (or a positional arg to `ingest`).
+- Server port: `7331` — `LLLOGS_PORT`.
+- Logging: `LLLOGS_LOG_LEVEL` (default `info`), `LLLOGS_LOG_DIR` (per-process JSONL files) — see [Logging](#logging) below.
 
 ## What you get
 
@@ -88,7 +88,7 @@ Paths and ports (override via env):
   results as colored unified diffs; a row drawer with the full raw JSON. All rendered via React (no
   `innerHTML` with event data).
 
-## HTTP API (served by `@clogdy/server`)
+## HTTP API (served by `@lllogs/server`)
 
 | method · path | purpose |
 | --- | --- |
@@ -107,11 +107,11 @@ A Bun workspaces monorepo. The v2 app is five packages under `packages/`:
 
 | package | role |
 | --- | --- |
-| `@clogdy/shared` | shared TS types, the flatten port (JSONL line → `FlatEvent`s), config + SQL-guard utils |
-| `@clogdy/ingest` | tailer + batched idempotent SQLite writer + schema + CLI (the **writer** process) |
-| `@clogdy/server` | Hono HTTP/SSE API + static web serving (the **read-only reader** process) |
-| `@clogdy/analytics` | DuckDB read-only query CLI (DuckDB-only process; shelled out by the server) |
-| `@clogdy/web` | React 19 + TanStack + CodeMirror SPA, bundled with `Bun.build`, served by `@clogdy/server` |
+| `@lllogs/shared` | shared TS types, the flatten port (JSONL line → `FlatEvent`s), config + SQL-guard utils |
+| `@lllogs/ingest` | tailer + batched idempotent SQLite writer + schema + CLI (the **writer** process) |
+| `@lllogs/server` | Hono HTTP/SSE API + static web serving (the **read-only reader** process) |
+| `@lllogs/analytics` | DuckDB read-only query CLI (DuckDB-only process; shelled out by the server) |
+| `@lllogs/web` | React 19 + TanStack + CodeMirror SPA, bundled with `Bun.build`, served by `@lllogs/server` |
 
 ## Development
 
@@ -119,10 +119,10 @@ A Bun workspaces monorepo. The v2 app is five packages under `packages/`:
 | --- | --- |
 | `bun run check` | `tsc --noEmit` across every workspace |
 | `bun test` | unit + e2e tests (`bun:test`) for all packages |
-| `bun run v2:ingest -- --backfill\|--watch` | build / live-update the DB |
-| `bun run v2:web:build` | bundle the React app |
-| `bun run v2:serve` | start the server |
-| `bun run v2:analytics -- --metric <name> --db <path>` | run an analytics metric directly |
+| `bun run ingest -- --backfill\|--watch` | build / live-update the DB |
+| `bun run web:build` | bundle the React app |
+| `bun run serve` | start the server |
+| `bun run analytics -- --metric <name> --db <path>` | run an analytics metric directly |
 | `bunx playwright test` (in `packages/web`) | recorded UI tests (video + screenshots) |
 
 A **lefthook** pre-commit hook runs `bun run check` + `bun test`, blocking commits that don't type-check
@@ -137,19 +137,19 @@ Every process emits **structured JSONL** (via [pino](https://getpino.io) in sync
 worker-thread transports) so a run is auditable as evidence, not just by its output. Quiet by default;
 enable with two env vars, inherited by every spawned child:
 
-- `CLOGDY_LOG_LEVEL` = `silent|error|warn|info|debug` (default `info`; `debug` adds per-request, SSE, and
+- `LLLOGS_LOG_LEVEL` = `silent|error|warn|info|debug` (default `info`; `debug` adds per-request, SSE, and
   analytics-subprocess detail).
-- `CLOGDY_LOG_DIR` = a directory; each process writes its own `<proc>[-<pid>].jsonl` (unset → stderr).
+- `LLLOGS_LOG_DIR` = a directory; each process writes its own `<proc>[-<pid>].jsonl` (unset → stderr).
 
 ```bash
-CLOGDY_LOG_LEVEL=debug bun start 2>&1 | bunx pino-pretty   # human-readable logs (pretty is out-of-process)
-CLOGDY_LOG_DIR=./logs CLOGDY_LOG_LEVEL=debug bun start     # JSONL → ./logs/{server,ingest,…}.jsonl
+LLLOGS_LOG_LEVEL=debug bun start 2>&1 | bunx pino-pretty   # human-readable logs (pretty is out-of-process)
+LLLOGS_LOG_DIR=./logs LLLOGS_LOG_LEVEL=debug bun start     # JSONL → ./logs/{server,ingest,…}.jsonl
 ```
 
 **Logs never go to stdout** — stderr or a file only. The analytics subprocess's stdout is the JSON
-result wire the server parses, so it logs to a **file only** (silent without `CLOGDY_LOG_DIR`). In the
+result wire the server parses, so it logs to a **file only** (silent without `LLLOGS_LOG_DIR`). In the
 browser, raise the level with `/?log=debug` (the React app logs to the console). `bun test` is silent by
-default (`bunfig.toml` → `bun-test-setup.ts`; override with `CLOGDY_LOG_LEVEL=debug`).
+default (`bunfig.toml` → `bun-test-setup.ts`; override with `LLLOGS_LOG_LEVEL=debug`).
 
 `docs/v2/08-LOGGING.md` has the full schema, the `parseLogLines`/`selectEvents` test helpers, and the
 Playwright evidence harness that asserts correctness from `server.jsonl` + the analytics file + the

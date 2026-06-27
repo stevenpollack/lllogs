@@ -2,7 +2,7 @@
  * T-5.7 (c) phase5.pw.ts — Phase 5 gate: facet+SQL integration + bounded-DOM proof.
  *
  * APPROACH CHOSEN (stated per spec):
- *   Both tests run against the small fixture.db (the default CLOGDY_FIXTURE_DB).
+ *   Both tests run against the small fixture.db (the default LLLOGS_FIXTURE_DB).
  *   The fixture has ~14 events — fast queries; no 56k-corpus DuckDB slowness.
  *   The 56k bounded-DOM proof is owned by the already-passing t5.3-virtualization.pw.ts
  *   (which uses demo.db). This file focuses on the SQL integration flow + a minimal

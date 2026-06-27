@@ -1,6 +1,6 @@
-# @clogdy/tui-v2
+# @lllogs/tui
 
-A terminal live-monitor for clogdy v2 — built for watching a Claude Code session
+A terminal live-monitor for lllogs v2 — built for watching a Claude Code session
 on a **headless box or inside a docker container**, over SSH / `docker exec`,
 where the browser UI isn't an option.
 
@@ -12,13 +12,13 @@ column control, and a detail drawer.
 ## Run
 
 ```bash
-bun run v2:tui                  # spawn the ingester + monitor the default DB
-bun run v2:tui -- --no-ingest   # attach to an externally-managed ingester (e.g. `bun start`)
-bun run v2:tui -- --db <path>   # an explicit DB
-bun run v2:tui -- --help
+bun run tui                  # spawn the ingester + monitor the default DB
+bun run tui -- --no-ingest   # attach to an externally-managed ingester (e.g. `bun start`)
+bun run tui -- --db <path>   # an explicit DB
+bun run tui -- --help
 ```
 
-By default `v2:tui` is self-contained: it spawns `v2:ingest --watch` (the single
+By default `tui` is self-contained: it spawns `ingest --watch` (the single
 writer) with its logs redirected to a file so nothing corrupts the screen, then
 renders a read-only view. Run it where the transcripts live (the same box /
 container as the Claude session) — SSH / `docker exec` is just the terminal
@@ -45,7 +45,7 @@ record's correlation id · `q` / `Esc` close.
 
 Co-located, zero network. The process opens the SQLite store read-only via
 `bun:sqlite` and reuses the server's pure query functions
-(`@clogdy/server/src/queries`) plus the shared render helpers (`@clogdy/shared`)
+(`@lllogs/server/src/queries`) plus the shared render helpers (`@lllogs/shared`)
 through a `DataSource` seam — DuckDB and Hono never enter the process (ground
 rules #3/#5/#9). The live tail is a ~1s keyset poll; facet counts come from
 `queryFacets`. See the plan in `.claude/plans/` and `docs/v2/` for the rationale.

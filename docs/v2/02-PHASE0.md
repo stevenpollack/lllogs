@@ -1,6 +1,6 @@
 # Phase 0 — Scaffolding & contracts
 
-Goal: stand up the five empty workspace packages with passing typecheck, and implement `@clogdy/shared`
+Goal: stand up the five empty workspace packages with passing typecheck, and implement `@lllogs/shared`
 (the types, the flatten port, the config util) that everything else depends on. Read
 `00-ORCHESTRATION.md` (ground rules + layout) and `01-CONTRACTS.md` (§1, §3, §4, §9) before starting.
 
@@ -11,27 +11,27 @@ Goal: stand up the five empty workspace packages with passing typecheck, and imp
 **Goal:** create the five package dirs, wire workspaces + root scripts, every package typechecks empty.
 
 **Files (create):**
-- `packages/shared/package.json` — name `@clogdy/shared`, `private:true`, `"type":"module"`,
+- `packages/shared/package.json` — name `@lllogs/shared`, `private:true`, `"type":"module"`,
   **`"exports": { ".": "./src/index.ts" }`, `"module": "./src/index.ts"`, `"types": "./src/index.ts"`**
-  (REQUIRED entry point — see ground-rule gotcha; without it `import … from "@clogdy/shared"` is
+  (REQUIRED entry point — see ground-rule gotcha; without it `import … from "@lllogs/shared"` is
   unresolvable and Phase 1 won't compile), `devDependencies: { "@types/bun":"^1.3.14" }`, scripts
   `{ "check":"tsc --noEmit" }`.
 - `packages/shared/tsconfig.json` — `{ "extends":"../../tsconfig.json", "compilerOptions": { "noEmit": true }, "include": ["src"] }`.
 - `packages/shared/src/index.ts` — re-exports (empty for now: `export {};`).
-- `packages/ingest/package.json` — name `@clogdy/ingest`, `"type":"module"`, deps `{ "@clogdy/shared":"file:../shared" }`, dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`, and the same **`exports`/`module`/`types` → `./src/index.ts`** entry point (ingest is imported by server + the e2e tests).
+- `packages/ingest/package.json` — name `@lllogs/ingest`, `"type":"module"`, deps `{ "@lllogs/shared":"file:../shared" }`, dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`, and the same **`exports`/`module`/`types` → `./src/index.ts`** entry point (ingest is imported by server + the e2e tests).
 - `packages/ingest/tsconfig.json` — same shape as shared's.
-- `packages/server/package.json` — name `@clogdy/server`, deps `{ "@clogdy/shared":"file:../shared", "hono":"^4.6.0" }`, dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`.
+- `packages/server/package.json` — name `@lllogs/server`, deps `{ "@lllogs/shared":"file:../shared", "hono":"^4.6.0" }`, dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`.
 - `packages/server/tsconfig.json` — extends root; add `"lib":["ES2022","DOM"]` is NOT needed (server is Bun). Keep root lib.
-- `packages/analytics/package.json` — name `@clogdy/analytics`, deps `{ "@clogdy/shared":"file:../shared", "@duckdb/node-api":"1.4.5-r.1" }` (EXACT pin — a caret range does NOT resolve; see CONTRACTS §Pinned-deps), dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`.
+- `packages/analytics/package.json` — name `@lllogs/analytics`, deps `{ "@lllogs/shared":"file:../shared", "@duckdb/node-api":"1.4.5-r.1" }` (EXACT pin — a caret range does NOT resolve; see CONTRACTS §Pinned-deps), dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`.
 - `packages/analytics/tsconfig.json` — extends root.
-- `packages/web/package.json` — name `@clogdy/web`, deps `{ "@clogdy/shared":"file:../shared" }`, dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`.
+- `packages/web/package.json` — name `@lllogs/web`, deps `{ "@lllogs/shared":"file:../shared" }`, dev `@types/bun`, scripts `{ "check":"tsc --noEmit" }`.
 - `packages/web/tsconfig.json` — extends root **plus** `"compilerOptions": { "target":"ES2022", "lib":["ES2022","DOM","DOM.Iterable"] }` (browser code; `target` matches the `lib` to avoid an ES2020-target/ES2022-lib mismatch).
 - Placeholder `src/index.ts` (`export {};`) in ingest/server/analytics; `packages/web/src/main.ts` (`export {};`).
 
 **Wiring (edit root files):**
 - Root `package.json`: set `"workspaces": ["tui", "packages/*"]`; add the `v2:*` scripts from
-  CONTRACTS §9; change `"check"` to `"tsc --noEmit && bun run --filter '@clogdy/*' check"` (the glob
-  already covers `@clogdy/tui` — do not also list it explicitly).
+  CONTRACTS §9; change `"check"` to `"tsc --noEmit && bun run --filter '@lllogs/*' check"` (the glob
+  already covers `@lllogs/tui` — do not also list it explicitly).
 - **Every** package sets `"type": "module"` in its `package.json` (shared, ingest, server, analytics, web).
 - Run `bun install` so workspace symlinks resolve.
 - **Do not** alter any v1 file, the existing `tui` package, or `logdy.config.json`.
@@ -40,9 +40,9 @@ Goal: stand up the five empty workspace packages with passing typecheck, and imp
 
 **Acceptance (orchestrator runs):**
 - `bun install` clean.
-- `bun run check` → passes (root tsc + tui + all `@clogdy/*` packages, all empty/typecheck-clean).
+- `bun run check` → passes (root tsc + tui + all `@lllogs/*` packages, all empty/typecheck-clean).
 - `bun test` → still 60 pass / 0 fail (v1 untouched).
-- **Cross-package import resolves:** `bun -e 'import("@clogdy/shared").then(m=>{ if(typeof m!=="object") process.exit(1) })'` exits 0 (proves the entry point works — a placeholder `export {}` is enough at this stage). This is the check that would have caught the F1 blocker.
+- **Cross-package import resolves:** `bun -e 'import("@lllogs/shared").then(m=>{ if(typeof m!=="object") process.exit(1) })'` exits 0 (proves the entry point works — a placeholder `export {}` is enough at this stage). This is the check that would have caught the F1 blocker.
 - `git status` shows only new `packages/**` files + root `package.json`/`bun.lock` modified.
 
 **Subagent prompt:** use the template in `00-ORCHESTRATION.md`, `<PHASE FILE>`=`02-PHASE0.md`,
@@ -50,7 +50,7 @@ Goal: stand up the five empty workspace packages with passing typecheck, and imp
 
 ---
 
-## T-0.2 — `@clogdy/shared`: types + flatten port + tests (PG1, needs 0.1)
+## T-0.2 — `@lllogs/shared`: types + flatten port + tests (PG1, needs 0.1)
 
 **Goal:** the frozen types and the pure `flattenLine` port, fully unit-tested against real transcript
 shapes.
@@ -98,14 +98,14 @@ shapes.
 
 ---
 
-## T-0.3 — `@clogdy/shared`: config / data-dir util + tests (PG1, needs 0.1)
+## T-0.3 — `@lllogs/shared`: config / data-dir util + tests (PG1, needs 0.1)
 
 **Goal:** path resolution per CONTRACTS §4.
 
 **Files (create):**
 - `packages/shared/src/config.ts` — `resolvePaths`, `defaultDbPath`, `defaultRoot`, `Paths`.
-  - `defaultDbPath()`: `process.env.CLOGDY_DB ?? join(process.env.XDG_DATA_HOME ?? join(homedir(),".local","share"), "clogdy", "clogdy.db")`.
-  - `defaultRoot()`: `process.env.CLOGDY_ROOT ?? join(homedir(), ".claude", "projects")`.
+  - `defaultDbPath()`: `process.env.LLLOGS_DB ?? join(process.env.XDG_DATA_HOME ?? join(homedir(),".local","share"), "lllogs", "lllogs.db")`.
+  - `defaultRoot()`: `process.env.LLLOGS_ROOT ?? join(homedir(), ".claude", "projects")`.
   - `resolvePaths({db,root})`: each path = explicit arg `??` `defaultDbPath()`/`defaultRoot()` (which
     already read env), so it's two tiers in code (arg vs default), not three. Then expand a leading `~`
     on the RESULT (covers arg/env/default uniformly; a no-op on the homedir-built defaults).
@@ -121,4 +121,4 @@ match the formulas above (set/unset env via a saved/restored `process.env`).
 
 **Integration note for orchestrator:** after 0.2 and 0.3 both merge, ensure
 `packages/shared/src/index.ts` exports all three modules (`types`, `flatten`, `config`); fix if a
-subagent left it partial. Commit Phase 0 as `feat(v2): scaffold workspaces + @clogdy/shared (types, flatten port, config)`.
+subagent left it partial. Commit Phase 0 as `feat(v2): scaffold workspaces + @lllogs/shared (types, flatten port, config)`.

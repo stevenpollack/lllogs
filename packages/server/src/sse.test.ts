@@ -10,8 +10,8 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { openDb, runIngest, makeWriter } from "@clogdy/ingest";
-import type { FlatEvent } from "@clogdy/shared";
+import { openDb, runIngest, makeWriter } from "@lllogs/ingest";
+import type { FlatEvent } from "@lllogs/shared";
 import { maxEventId } from "./queries";
 import { pollNewEvents, createApp } from "./app";
 
@@ -25,9 +25,9 @@ let dbPath: string;
 let rodb: Database; // readonly reader
 
 beforeAll(async () => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-sse-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-sse-"));
   root = join(dir, "projects");
-  dbPath = join(dir, "clogdy.db");
+  dbPath = join(dir, "lllogs.db");
 
   // One project, one session: prompt + tool_use(Bash) + tool_result(ok)
   const d1 = join(root, "myproject-A");

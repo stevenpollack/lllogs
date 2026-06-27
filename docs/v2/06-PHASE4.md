@@ -46,7 +46,7 @@ for a diff, for stdout+stderr, for the 14-line cap, for a lone plain line.
 - **Security:** all cell content goes through `textContent`/DOM construction — never `innerHTML` with
   event data. (v1 had to hand-escape because Logdy used innerHTML; we avoid the whole class of bug.)
 
-**Acceptance:** `bun run v2:web:build` ok; `bun run check` green; manual: composite Bash commands and
+**Acceptance:** `bun run web:build` ok; `bun run check` green; manual: composite Bash commands and
 diffs render like v1 (or better).
 
 ---
@@ -56,7 +56,7 @@ diffs render like v1 (or better).
 **Files:** edit `tui/picker.tsx` (add an opt-in path; **keep the existing Logdy path** until T-4.4).
 
 **Spec:** add a `--v2` flag to the picker. When set, on `enter` the handoff: ensure a v2 server is
-running (spawn `bun run v2:serve` from coreRoot if `GET /healthz` on the port fails), then build a URL
+running (spawn `bun run serve` from coreRoot if `GET /healthz` on the port fails), then build a URL
 with the selection encoded as filter query params (`?project=…` or repeated `session=…` — the picker
 already has `collapseSelection`; map it to `project`/`session` filter params, noting the API takes a
 single `project`/`session` — for multi-select, prefer opening the project filter, or open the table
@@ -83,7 +83,7 @@ launch (T-4.3); the user has used v2 and signed off.
   `scripts/snapshot.ts`, `logdy.config.json`, `config.base.json`, the `tui` Logdy handoff path (make
   `--v2` the default / only path), and the v1-only root scripts (`build`, `follow`, `snapshot`,
   `picker`'s Logdy branch). Keep `scripts/lib/sessions.ts` only if still used by the TUI; otherwise port
-  it into `@clogdy/shared` and remove.
+  it into `@lllogs/shared` and remove.
 - Update `CLAUDE.md` + `README.md` to describe v2 as the tool (archive the Logdy sections or move them to
   `docs/v1-logdy-archive.md`).
 - Ensure `bun run check` + `bun test` green with v1 gone; update the root `check` script (drop the v1
@@ -97,7 +97,7 @@ launch (T-4.3); the user has used v2 and signed off.
 ---
 
 ## Closing note for the orchestrator
-After Phase 3 (before Phase 4), clogdy v2 already **beats Logdy** on every axis the user cared about:
+After Phase 3 (before Phase 4), lllogs v2 already **beats Logdy** on every axis the user cared about:
 full-corpus accurate facets, live monitoring without the backlog cap, and server-side analytics. Phase 4
 is quality + decommissioning. If the user wants to stop at "v2 works, keep v1 around," that's a valid
 endpoint — Phase 4.4 is explicitly optional and gated.

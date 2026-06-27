@@ -1,6 +1,6 @@
 import type { Database } from "bun:sqlite";
-import type { EventFilter, EventRow, FacetBucket, Facets } from "@clogdy/shared";
-import { asArray } from "@clogdy/shared";
+import type { EventFilter, EventRow, FacetBucket, Facets } from "@lllogs/shared";
+import { asArray } from "@lllogs/shared";
 
 type SqlValue = string | number | null;
 

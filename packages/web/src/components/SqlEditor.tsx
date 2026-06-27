@@ -4,7 +4,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import CodeMirror, { keymap, Prec, EditorView } from "@uiw/react-codemirror";
 import { sql } from "@codemirror/lang-sql";
-import { SQL_COLUMNS, SQL_RELATION } from "@clogdy/shared";
+import { SQL_COLUMNS, SQL_RELATION } from "@lllogs/shared";
 
 interface SqlEditorProps {
   value: string;
@@ -39,7 +39,7 @@ const EXAMPLES = [
 ];
 
 // Column completions for @codemirror/lang-sql, derived from the single source of
-// truth in @clogdy/shared. `detail` shows the type after the label; `info` shows
+// truth in @lllogs/shared. `detail` shows the type after the label; `info` shows
 // the description when the item is highlighted. (Typed structurally as the
 // lang-sql schema's Completion shape — no direct @codemirror/autocomplete dep.)
 const COLUMN_COMPLETIONS = SQL_COLUMNS.map((c) => ({

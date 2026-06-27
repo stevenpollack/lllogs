@@ -1,4 +1,4 @@
-clogdy ▸ LIVE ● · 10/5m
+lllogs ▸ LIVE ● · 10/5m
 TIME           KIND        TOOL         COMMAND                                  ERR
 06-27 20:24:50 prompt                   add a /healthz route and tests
 06-27 20:25:10 tool_use    Read         src/server.ts

@@ -22,7 +22,7 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { ingestFixture, transcriptLine as line } from "@clogdy/shared/testing";
+import { ingestFixture, transcriptLine as line } from "@lllogs/shared/testing";
 import { createApp } from "./app";
 
 const REPO_ROOT = resolve(import.meta.dir, "../../..");
@@ -32,10 +32,10 @@ const T = 1700000000000; // 2023-11-14T22:13:20Z
 
 // Two projects so facet scoping is testable.
 const SESSION_X = "sess-xxxx";
-const CWD_X = `/tmp/clogdy-srv-q-test/projX`;
+const CWD_X = `/tmp/lllogs-srv-q-test/projX`;
 
 const SESSION_Y = "sess-yyyy";
-const CWD_Y = `/tmp/clogdy-srv-q-test/projY`;
+const CWD_Y = `/tmp/lllogs-srv-q-test/projY`;
 
 // Fixture:
 //   Project X (projX): 2 tool_use (Bash, Read) + 2 tool_result = 4 events
@@ -109,7 +109,7 @@ let db: Database;
 let app: ReturnType<typeof createApp>;
 
 beforeAll(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), "clogdy-query-server-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "lllogs-query-server-"));
   const tree = join(tmpDir, "tree");
   // Project name = basename(cwd in the JSONL line) — the directory layout under
   // tree is arbitrary; what matters is the sessionId.jsonl filename + cwd in each line.
@@ -163,7 +163,7 @@ describe("POST /api/query", () => {
       [
         "bun",
         "run",
-        "v2:analytics",
+        "analytics",
         "--",
         "--db",
         dbPath,

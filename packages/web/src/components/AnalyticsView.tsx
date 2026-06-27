@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import type { EventFilter } from "@clogdy/shared";
+import type { EventFilter } from "@lllogs/shared";
 import { getStats } from "../api";
 import { barList, sparkBars, gauge, table } from "../charts";
 

@@ -13,5 +13,5 @@ const HERE = fileURLToPath(new URL(".", import.meta.url)); // packages/web/e2e/
 // inode and the spec reads an empty file. So we let Playwright clear it for us by
 // co-locating LOG_DIR with the other test artifacts. (Both repo-root/test-results
 // and packages/web/test-results are gitignored.)
-export const LOG_DIR = resolve(HERE, "../test-results/clogdy-logs");
+export const LOG_DIR = resolve(HERE, "../test-results/lllogs-logs");
 export const SERVER_LOG = resolve(LOG_DIR, "server.jsonl");

@@ -1,4 +1,4 @@
-import type { EventFilter, EventRow, Facets } from "@clogdy/shared";
+import type { EventFilter, EventRow, Facets } from "@lllogs/shared";
 import { log } from "./log";
 
 /** Append a filter value to URLSearchParams — arrays become repeated params. */

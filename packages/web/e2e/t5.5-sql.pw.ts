@@ -12,7 +12,7 @@ const shot = (name: string) => resolve(SHOTS, name);
 
 test("T-5.5 SQL: facet → SQL editor → run → result → error → clear", async ({ page }) => {
   // Functional SQL-editor evidence runs against the small fixture.db (default
-  // CLOGDY_FIXTURE_DB) — fast. The 56k corpus is the virtualization proof's job
+  // LLLOGS_FIXTURE_DB) — fast. The 56k corpus is the virtualization proof's job
   // (T-5.3/T-5.7), not this one; a DuckDB quantile over 56k blows the budget.
   test.setTimeout(120_000);
 

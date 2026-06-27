@@ -1,4 +1,4 @@
-import type { EventFilter, EventRow } from "@clogdy/shared";
+import type { EventFilter, EventRow } from "@lllogs/shared";
 import { appendParam } from "./api";
 import { log } from "./log";
 

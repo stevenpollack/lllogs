@@ -1,5 +1,5 @@
 import type { Database, Statement } from "bun:sqlite";
-import type { FlatEvent } from "@clogdy/shared";
+import type { FlatEvent } from "@lllogs/shared";
 
 export interface Writer {
   /** Buffer events; flushes at batchSize or flush(). Returns inserted count (post OR IGNORE). */

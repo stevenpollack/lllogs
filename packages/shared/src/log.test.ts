@@ -5,7 +5,7 @@ import { SCHEMA_OPTS, parseLogLines, selectEvents, type LogEntry, type LogLevel 
 /**
  * Build a pino logger writing JSONL into an in-memory buffer (no fd, no file) so a test can
  * read back exactly what the schema serializes. Construct pino directly from SCHEMA_OPTS — this
- * test stays isomorphic and must NOT import `@clogdy/shared/node` (the node-only sink).
+ * test stays isomorphic and must NOT import `@lllogs/shared/node` (the node-only sink).
  */
 function capture(level: LogLevel = "debug") {
   const buf: string[] = [];

@@ -7,9 +7,9 @@ import { LOG_DIR } from "./e2e/logenv";
 // fixture (2 projects, 3 sessions, Bash/Read/Edit, one error) lives in the scratchpad;
 // the 56k demo.db is used for the virtualization/perf specs (T-5.3, T-5.7).
 const FIXTURE_DB =
-  process.env.CLOGDY_FIXTURE_DB ??
-  "/tmp/claude-1000/-home-steven-repos-clogdy/84372ce7-8cc7-4a97-b48e-31328543a00b/scratchpad/fixture.db";
-const PORT = Number(process.env.CLOGDY_FIXTURE_PORT ?? 7357);
+  process.env.LLLOGS_FIXTURE_DB ??
+  "/tmp/claude-1000/-home-steven-repos-lllogs/84372ce7-8cc7-4a97-b48e-31328543a00b/scratchpad/fixture.db";
+const PORT = Number(process.env.LLLOGS_FIXTURE_PORT ?? 7357);
 // `import.meta.dir` is Bun-only; the Playwright CLI loads this config under Node,
 // where it is undefined. `fileURLToPath(new URL(".", import.meta.url))` is the dir
 // of this file (packages/web/) in BOTH runtimes.
@@ -40,18 +40,18 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // serve.ts reads CLOGDY_DB / CLOGDY_PORT from the env (DECISIONS D-5.h), not flags.
-    command: "bun run v2:serve",
+    // serve.ts reads LLLOGS_DB / LLLOGS_PORT from the env (DECISIONS D-5.h), not flags.
+    command: "bun run serve",
     cwd: REPO_ROOT,
     env: {
       ...process.env,
-      CLOGDY_DB: FIXTURE_DB,
-      CLOGDY_PORT: String(PORT),
+      LLLOGS_DB: FIXTURE_DB,
+      LLLOGS_PORT: String(PORT),
       // Make the server-under-test (and the analytics children it spawns, which
       // inherit this env) write structured JSONL the spec asserts on. `debug`
       // captures req.start/req.end, sse.append, analytics.attach, etc.
-      CLOGDY_LOG_DIR: LOG_DIR,
-      CLOGDY_LOG_LEVEL: "debug",
+      LLLOGS_LOG_DIR: LOG_DIR,
+      LLLOGS_LOG_LEVEL: "debug",
     },
     url: `http://localhost:${PORT}/healthz`,
     reuseExistingServer: false,

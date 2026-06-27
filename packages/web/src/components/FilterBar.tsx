@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
-import type { EventFilter } from "@clogdy/shared";
-import { asArray } from "@clogdy/shared";
+import type { EventFilter } from "@lllogs/shared";
+import { asArray } from "@lllogs/shared";
 import type { VisibilityState } from "@tanstack/react-table";
 
 function shortSession(s: string): string {

@@ -7,7 +7,7 @@
 // drives the SQL editor's autocomplete and column reference in the web UI.
 //
 // DRY note: the column *names/types* duplicate the DDL in
-// `@clogdy/ingest`'s schema.ts. They can't be derived from it (the DDL is a raw
+// `@lllogs/ingest`'s schema.ts. They can't be derived from it (the DDL is a raw
 // SQL string and carries no human descriptions), so `schema.test.ts` in ingest
 // asserts this list stays in sync with the `event` table columns.
 

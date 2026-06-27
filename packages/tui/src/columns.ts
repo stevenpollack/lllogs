@@ -1,5 +1,5 @@
-import type { EventRow } from "@clogdy/shared";
-import { formatToolInput } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
+import { formatToolInput } from "@lllogs/shared";
 
 /**
  * One displayable table column. `value` returns a SINGLE-LINE string for the

@@ -9,15 +9,15 @@ Pinned dependency versions (use exactly these in each package's `package.json`):
 | package | dep | version |
 | --- | --- | --- |
 | (built-in) | `bun:sqlite` | bundled with Bun (no entry needed) |
-| @clogdy/server | `hono` | `^4.6.0` |
-| @clogdy/analytics | `@duckdb/node-api` | `1.4.5-r.1` (EXACT pin, no caret) |
-| @clogdy/web (Phase 5) | `react`, `react-dom` | `^19.2.7` (MATCH the tui's react — avoid a duplicate React) |
-| @clogdy/web (Phase 5) | `@tanstack/react-table` | `^8.20.0` |
-| @clogdy/web (Phase 5) | `@tanstack/react-virtual` | `^3.10.0` |
-| @clogdy/web (Phase 5) | `@uiw/react-codemirror`, `@codemirror/lang-sql` | `^4.23.0` / `^6.8.0` (CodeMirror SQL editor; `<textarea>` is the zero-dep fallback) |
-| @clogdy/web (Phase 5, dev) | `@types/react`, `@types/react-dom` | `^19.2.17` / `^19.2.0` |
+| @lllogs/server | `hono` | `^4.6.0` |
+| @lllogs/analytics | `@duckdb/node-api` | `1.4.5-r.1` (EXACT pin, no caret) |
+| @lllogs/web (Phase 5) | `react`, `react-dom` | `^19.2.7` (MATCH the tui's react — avoid a duplicate React) |
+| @lllogs/web (Phase 5) | `@tanstack/react-table` | `^8.20.0` |
+| @lllogs/web (Phase 5) | `@tanstack/react-virtual` | `^3.10.0` |
+| @lllogs/web (Phase 5) | `@uiw/react-codemirror`, `@codemirror/lang-sql` | `^4.23.0` / `^6.8.0` (CodeMirror SQL editor; `<textarea>` is the zero-dep fallback) |
+| @lllogs/web (Phase 5, dev) | `@types/react`, `@types/react-dom` | `^19.2.17` / `^19.2.0` |
 | (root, Phase 5, dev) | `@playwright/test` | `^1.48.0` (UI-evidence harness; `bunx playwright install chromium` once; ships nothing) |
-| @clogdy/shared (+ server, ingest, analytics, web) | `pino` | `^10.3.1` (structured logging; node sink lives behind the `@clogdy/shared/node` subpath, never the barrel) |
+| @lllogs/shared (+ server, ingest, analytics, web) | `pino` | `^10.3.1` (structured logging; node sink lives behind the `@lllogs/shared/node` subpath, never the barrel) |
 | (root, dev) | `pino-pretty` | `^13.1.3` (dev-only out-of-process pretty pipe; **never** an in-process transport) |
 
 > ⚠️ `@duckdb/node-api` ships with `-r.N` build-tag versions (e.g. `1.4.5-r.1`) and the only `1.2.x`
@@ -27,23 +27,23 @@ Pinned dependency versions (use exactly these in each package's `package.json`):
 | all | `@types/bun` (dev) | `^1.3.14` (match root) |
 
 Default ports / paths (override via env shown):
-- Server HTTP port: **7331** (`CLOGDY_PORT`).
-- DB path: **`$XDG_DATA_HOME/clogdy/clogdy.db`**, falling back to **`~/.local/share/clogdy/clogdy.db`**
-  (`CLOGDY_DB`). The ingester creates the parent dir (`mkdir -p`) on open.
-- Transcript root: **`~/.claude/projects`** (`CLOGDY_ROOT` or a positional CLI arg).
-- Log level: **`info`** (`CLOGDY_LOG_LEVEL` ∈ `debug|info|warn|error|silent`; an unknown value falls back to
+- Server HTTP port: **7331** (`LLLOGS_PORT`).
+- DB path: **`$XDG_DATA_HOME/lllogs/lllogs.db`**, falling back to **`~/.local/share/lllogs/lllogs.db`**
+  (`LLLOGS_DB`). The ingester creates the parent dir (`mkdir -p`) on open.
+- Transcript root: **`~/.claude/projects`** (`LLLOGS_ROOT` or a positional CLI arg).
+- Log level: **`info`** (`LLLOGS_LOG_LEVEL` ∈ `debug|info|warn|error|silent`; an unknown value falls back to
   `info`, never throws at logger construction).
-- Log dir: unset → stderr, **silent for analytics** (`CLOGDY_LOG_DIR`); when set each process writes its own
+- Log dir: unset → stderr, **silent for analytics** (`LLLOGS_LOG_DIR`); when set each process writes its own
   `<proc>[-<pid>].jsonl` (analytics is per-pid — spawned per request, concurrent).
 
 **Logging invariant:** structured logs go to **stderr or a file, never stdout**. The **analytics** process
 logs to a **file only** (never stdout *or* stderr) — its stdout is the JSON-result wire the server
 `JSON.parse`s and its stderr is the error-string wire the server forwards to the user; both are reserved.
-Without `CLOGDY_LOG_DIR` analytics is silent and the server narrates it.
+Without `LLLOGS_LOG_DIR` analytics is silent and the server narrates it.
 
 ---
 
-## 1. `@clogdy/shared` — TS types (file: `packages/shared/src/types.ts`)
+## 1. `@lllogs/shared` — TS types (file: `packages/shared/src/types.ts`)
 
 ```ts
 /** A normalized tool-usage event: one row per content block of interest. */
@@ -252,19 +252,19 @@ only structural change is iterating all blocks and emitting per block.
 
 ---
 
-## 4. `@clogdy/shared` — config util (file: `packages/shared/src/config.ts`)
+## 4. `@lllogs/shared` — config util (file: `packages/shared/src/config.ts`)
 
 ```ts
 export interface Paths { db: string; root: string }
 /** Resolve DB + transcript-root paths from env/args, expanding ~ and creating no dirs (callers mkdir). */
 export function resolvePaths(argv?: { db?: string; root?: string }): Paths;
-export function defaultDbPath(): string;   // $XDG_DATA_HOME/clogdy/clogdy.db || ~/.local/share/clogdy/clogdy.db
-export function defaultRoot(): string;     // CLOGDY_ROOT || ~/.claude/projects
+export function defaultDbPath(): string;   // $XDG_DATA_HOME/lllogs/lllogs.db || ~/.local/share/lllogs/lllogs.db
+export function defaultRoot(): string;     // LLLOGS_ROOT || ~/.claude/projects
 ```
 
-### `@clogdy/shared` — structured logging (files: `packages/shared/src/log.ts`, `log-node.ts`)
+### `@lllogs/shared` — structured logging (files: `packages/shared/src/log.ts`, `log-node.ts`)
 
-The **isomorphic core** ships in the barrel (`@clogdy/shared`) and is browser-safe — it only
+The **isomorphic core** ships in the barrel (`@lllogs/shared`) and is browser-safe — it only
 `import type { LoggerOptions } from "pino"`, which is erased at build:
 - `SCHEMA_OPTS: LoggerOptions` — the shared `messageKey:"msg"` / `formatters.level` (string label) /
   `timestamp` (`,"ts":"<ISO>"`) so the node and browser loggers emit **one** evidence schema.
@@ -273,11 +273,11 @@ The **isomorphic core** ships in the barrel (`@clogdy/shared`) and is browser-sa
   `selectEvents(entries, { evt?, level? }): LogEntry[]` — the assertion primitives shared by `bun:test`
   and Playwright.
 
-The **node-only sink** lives behind the **subpath** `@clogdy/shared/node` (deliberately NOT re-exported by
+The **node-only sink** lives behind the **subpath** `@lllogs/shared/node` (deliberately NOT re-exported by
 the barrel, so `pino`'s `node:fs`/`sonic-boom` stay out of the browser bundle):
-- `nodeLogger(proc: string): Logger`. Sink precedence: `CLOGDY_LOG_DIR` set → `<dir>/<proc>[-<pid>].jsonl`
+- `nodeLogger(proc: string): Logger`. Sink precedence: `LLLOGS_LOG_DIR` set → `<dir>/<proc>[-<pid>].jsonl`
   (sync; analytics per-pid); else proc `analytics` → **silent** (its wires are reserved); else → stderr
-  (fd 2, sync). Level from `CLOGDY_LOG_LEVEL` (default `info`, validated). `base:{proc,pid}` replaces pino's
+  (fd 2, sync). Level from `LLLOGS_LOG_LEVEL` (default `info`, validated). `base:{proc,pid}` replaces pino's
   default `{pid,hostname}` → **no hostname leak** in committed artifacts.
 
 One emitted line (schema both processes share):
@@ -287,7 +287,7 @@ One emitted line (schema both processes share):
 
 ---
 
-## 5. `@clogdy/ingest` — public surface
+## 5. `@lllogs/ingest` — public surface
 
 ```ts
 // packages/ingest/src/db.ts
@@ -314,14 +314,14 @@ export interface TailerOptions { root: string; full: boolean; intervalMs?: numbe
 export function tail(opts: TailerOptions, sink: (path: string, line: string) => void, once?: boolean): Promise<void>;
 ```
 
-CLI (file `packages/ingest/src/cli.ts`, exposed as root script `v2:ingest`):
+CLI (file `packages/ingest/src/cli.ts`, exposed as root script `ingest`):
 `--backfill` (one pass over existing files, then exit) | `--watch` (backfill then keep tailing) |
 `--db <path>` `--root <dir>` `--reset` (delete+recreate DB). Prints progress to stderr
 (`ingested N events from M files`).
 
 ---
 
-## 6. `@clogdy/server` — query layer + HTTP API
+## 6. `@lllogs/server` — query layer + HTTP API
 
 Query layer (file `packages/server/src/queries.ts`), pure functions over a `bun:sqlite` `Database`:
 
@@ -349,7 +349,7 @@ invalid for those. The `IS NOT NULL` guard uses the underlying **column** (`is_e
 `tool`, `kind`, `role`, `project`), not the alias. This server-side GROUP BY over the full filtered
 set is the core Logdy-beating behavior — counts are exact, not "over delivered rows".
 
-HTTP API (file `packages/server/src/app.ts`, a Hono app; `serve.ts` boots it on `CLOGDY_PORT`):
+HTTP API (file `packages/server/src/app.ts`, a Hono app; `serve.ts` boots it on `LLLOGS_PORT`):
 
 | method · path | query | 200 response |
 | --- | --- | --- |
@@ -359,7 +359,7 @@ HTTP API (file `packages/server/src/app.ts`, a Hono app; `serve.ts` boots it on 
 | `GET /api/events/stream` | same filter params + `lastId` | **SSE**: `event: append` `data: {events:EventRow[], lastId}` every ~1s when new rows exist; `event: ping` heartbeat (Phase 2) |
 | `GET /api/stats` | `metric` ∈ {`toolCounts`,`errorRate`,`latency`,`projectRollup`,`timeBuckets`} + filter params (Phase 3) | `{ metric, data: <shape per metric, see Phase 3> }` |
 | `POST /api/query` (Phase 5) | JSON body `{ sql: string, filter?: EventFilter, limit?: number }` | `{ columns: string[], rows: unknown[][], truncated: boolean }` |
-| `GET /*` (else) | — | static web assets from `@clogdy/web` build dir; `/` → `index.html` |
+| `GET /*` (else) | — | static web assets from `@lllogs/web` build dir; `/` → `index.html` |
 
 All API responses are JSON, `Content-Type: application/json`. Errors → `{ error: string }` with 400 (bad
 param) or 500. The server opens the DB **read-only** (`new Database(path, { readonly: true })`).
@@ -374,7 +374,7 @@ SELECT * FROM ( <user sql> ) LIMIT <cap + 1>   -- cap+1 → detect truncation
 ```
 
 Behavior: parse `filter` (reuse the server's `EventFilter` parse; expand a short 8-char `session` like
-`/api/events`); **guard** `sql` with `assertSelectOnly` from `@clogdy/shared` (single statement;
+`/api/events`); **guard** `sql` with `assertSelectOnly` from `@lllogs/shared` (single statement;
 `^\s*(WITH|SELECT)\b`; block `ATTACH/DETACH/PRAGMA/INSTALL/LOAD/COPY/EXPORT/IMPORT/INSERT/UPDATE/UPSERT/
 DELETE/DROP/CREATE/ALTER/REPLACE/TRUNCATE/CALL/GRANT/REVOKE/VACUUM/CHECKPOINT`, comment-stripped first;
 reject a user CTE named `events`) → **400** `{error}` *before spawning*. Then **spawn the analytics CLI
@@ -389,13 +389,13 @@ and while it is active the web pauses SSE + keyset paging (facet **counts** stil
 
 ---
 
-## 7. `@clogdy/analytics` — DuckDB CLI contract (Phase 3)
+## 7. `@lllogs/analytics` — DuckDB CLI contract (Phase 3)
 
 A **standalone process**, DuckDB-only (never imports `bun:sqlite`). File `packages/analytics/src/query.ts`,
-root script `v2:analytics`:
+root script `analytics`:
 
 ```
-bun run v2:analytics -- --db <sqlite-path> --metric <name> [--filters '<json EventFilter>']
+bun run analytics -- --db <sqlite-path> --metric <name> [--filters '<json EventFilter>']
 → prints a single JSON object {metric, data} to stdout and exits 0; errors → stderr + exit 1.
 ```
 
@@ -408,12 +408,12 @@ defined in `04-PHASE3-DUCKDB.md`.
 unchanged):
 
 ```
-bun run v2:analytics -- --db <sqlite> --query --sql '<SELECT…>' [--filters '<json EventFilter>'] [--limit <n>]
+bun run analytics -- --db <sqlite> --query --sql '<SELECT…>' [--filters '<json EventFilter>'] [--limit <n>]
 → prints a single JSON object { columns: string[], rows: unknown[][], truncated: boolean } to stdout, exit 0;
   guard rejection / DuckDB error → stderr + exit 1.
 ```
 
-It calls `assertSelectOnly(sql)` (from `@clogdy/shared`), wraps the SQL in the **facet CTE** via
+It calls `assertSelectOnly(sql)` (from `@lllogs/shared`), wraps the SQL in the **facet CTE** via
 `buildWhere(filter)` (the exact rewriting in §6 / `07-PHASE5.md`), runs it via the same READ_ONLY
 `withDuck` ATTACH, reads `columns` from the result schema and `rows` as value-arrays, and sets
 `truncated` when the result exceeded `cap = min(limit ?? 1000, 5000)` (queried as `LIMIT cap+1`, sliced
@@ -422,17 +422,17 @@ to `cap`). Same DuckDB-only process; **never imports `bun:sqlite`**. The full Ph
 
 ---
 
-## 8. `@clogdy/web` — build + integration contract
+## 8. `@lllogs/web` — build + integration contract
 
-- Source TS in `packages/web/src/`, bundled by `Bun.build({ entrypoints:['src/main.ts'], outdir:'dist', target:'browser', minify:true })` via `packages/web/build.ts` (root script `v2:web:build`).
+- Source TS in `packages/web/src/`, bundled by `Bun.build({ entrypoints:['src/main.ts'], outdir:'dist', target:'browser', minify:true })` via `packages/web/build.ts` (root script `web:build`).
 - `packages/web/index.html` references `/dist/main.js`. The **server serves `packages/web/`** (index.html
   at `/`, `/dist/*` assets). No framework in Phases 1–4 (vanilla TS + DOM); Phase 4 added rich rendering
-  helpers from `@clogdy/shared`.
+  helpers from `@lllogs/shared`.
 - **Phase 5** migrates this package to **React 19 + `@tanstack/react-table`/`react-virtual`** (+ a
   CodeMirror SQL editor), still bundled by the **same `Bun.build`** (Bun transpiles JSX natively): the
   entrypoint becomes `src/main.tsx`, `tsconfig.json` gains `"jsx": "react-jsx"`, `index.html` keeps a
   `<div id="root">` + `/dist/main.js`. The build contract (still `Bun.build`, `target:'browser'`, served
-  by `@clogdy/server` from `packages/web/`) is unchanged. **Security: never `dangerouslySetInnerHTML`
+  by `@lllogs/server` from `packages/web/`) is unchanged. **Security: never `dangerouslySetInnerHTML`
   with event data** — React's default escaping replaces v1/T-4.2's hand-escaping; the structured
   `splitBashCommand`/`resultLines` helpers render as JSX elements, never HTML strings.
 - The web app talks to the API in §6 only. It must never assume row ordering beyond `id ASC`.
@@ -446,12 +446,12 @@ Root `package.json` gains:
 "workspaces": ["tui", "packages/*"],
 "scripts": {
   // … existing v1 scripts unchanged …
-  "v2:ingest":     "bun run packages/ingest/src/cli.ts",
-  "v2:serve":      "bun run packages/server/src/serve.ts",
-  "v2:analytics":  "bun run packages/analytics/src/query.ts",
-  "v2:web:build":  "bun run packages/web/build.ts",
-  "check":         "tsc --noEmit && bun run --filter '@clogdy/*' check"   // the glob covers @clogdy/tui too — don't also list it explicitly (double-runs)
+  "ingest":     "bun run packages/ingest/src/cli.ts",
+  "serve":      "bun run packages/server/src/serve.ts",
+  "analytics":  "bun run packages/analytics/src/query.ts",
+  "web:build":  "bun run packages/web/build.ts",
+  "check":         "tsc --noEmit && bun run --filter '@lllogs/*' check"   // the glob covers @lllogs/tui too — don't also list it explicitly (double-runs)
 }
 ```
 Each package has its own `tsconfig.json` extending root, and a `check` script (`tsc --noEmit`). Server
-must `v2:web:build` before serving in production; in dev it may build on boot.
+must `web:build` before serving in production; in dev it may build on boot.

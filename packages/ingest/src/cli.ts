@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { rmSync } from "node:fs";
-import { resolvePaths } from "@clogdy/shared";
-import { nodeLogger } from "@clogdy/shared/node";
+import { resolvePaths } from "@lllogs/shared";
+import { nodeLogger } from "@lllogs/shared/node";
 import { openDb } from "./db";
 import { runIngest } from "./ingest";
 
@@ -22,7 +22,7 @@ function parseArgs(argv: string[]): Args {
     else if (a === "--root") args.root = argv[++i];
     else if (a === "--reset") args.reset = true;
     else {
-      process.stderr.write(`v2:ingest: unknown arg ${a}\n`);
+      process.stderr.write(`ingest: unknown arg ${a}\n`);
       process.exit(1);
     }
   }

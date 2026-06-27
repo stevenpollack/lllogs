@@ -80,7 +80,7 @@ during verification, **stored on disk**, and **surfaced to the user**. Self-repo
   suffix is mandatory — NOT `.spec.ts`/`.test.ts` — so the lefthook `bun test` gate doesn't discover and
   crash on them; see DECISIONS D-5.i) with a
   `packages/web/playwright.config.ts` setting `use: { video: 'on', screenshot: 'on', trace: 'on' }` and a
-  `webServer` (or a manual boot) that serves a **known fixture DB** via `v2:serve` (ingest a fixture tree
+  `webServer` (or a manual boot) that serves a **known fixture DB** via `serve` (ingest a fixture tree
   with the ingest CLI first — separate process, ground rule #3). Run with `bunx playwright test`.
   - Note: `@playwright/test` and the Playwright **MCP** are different things; the MCP is fine for ad-hoc
     poking, but the **recorded** video/screenshot artifacts MUST come from `@playwright/test` runs (the
@@ -114,8 +114,8 @@ no I/O — usable by both the analytics CLI and the server); edit `packages/anal
 `buildQuery` + `runQuery`); edit `packages/analytics/src/query.ts` (CLI `--query` mode); add
 `packages/shared/src/sqlguard.test.ts` and `packages/analytics/src/query.test.ts`.
 
-> **Wiring / gotcha:** `sqlguard.ts` changes `@clogdy/shared`'s export surface → run **`bun install`**
-> after adding the export, or a cross-package `import { assertSelectOnly } from "@clogdy/shared"` fails
+> **Wiring / gotcha:** `sqlguard.ts` changes `@lllogs/shared`'s export surface → run **`bun install`**
+> after adding the export, or a cross-package `import { assertSelectOnly } from "@lllogs/shared"` fails
 > with a phantom `Export named … not found` (see 00-ORCHESTRATION "Known gotchas").
 
 **Spec:**
@@ -144,7 +144,7 @@ no I/O — usable by both the analytics CLI and the server); edit `packages/anal
     existing `withDuck(dbPath, fn)` READ_ONLY ATTACH — never writable.)
 - **`packages/analytics/src/query.ts`** CLI — add a `--query` mode alongside the existing `--metric` mode
   (do not break `--metric`):
-  `bun run v2:analytics -- --db <path> --query --sql '<SELECT…>' [--filters '<json>'] [--limit <n>]`
+  `bun run analytics -- --db <path> --query --sql '<SELECT…>' [--filters '<json>'] [--limit <n>]`
   → `cap = min(limit ?? 1000, 5000)`; on success print `JSON.stringify({columns, rows, truncated})` to
   stdout, exit 0; on guard rejection / DuckDB error → message to stderr, exit 1.
 
@@ -164,7 +164,7 @@ no I/O — usable by both the analytics CLI and the server); edit `packages/anal
 
 **Acceptance:** `bun test packages/shared/src/sqlguard.test.ts packages/analytics/src/query.test.ts`
 green; `bun run check` green; manual:
-`bun run v2:analytics -- --db /tmp/clogdy-smoke.db --query --sql "SELECT tool, COUNT(*) n FROM events GROUP BY tool ORDER BY n DESC"`
+`bun run analytics -- --db /tmp/lllogs-smoke.db --query --sql "SELECT tool, COUNT(*) n FROM events GROUP BY tool ORDER BY n DESC"`
 prints `{columns,rows,truncated}`.
 
 ---
@@ -182,7 +182,7 @@ modules `src/api.ts`, `src/live.ts`, `src/charts.ts`, `src/cells.ts` (the struct
 - `tsconfig.json`: add `"jsx": "react-jsx"` (mirror `tui/tsconfig.json`).
 - `build.ts`: `Bun.build({ entrypoints:['src/main.tsx'], outdir:'dist', target:'browser', minify:true })`
   — only the entry extension changes; CONTRACTS §8 build contract still holds (still `Bun.build`, still
-  served by `@clogdy/server` from `packages/web/`).
+  served by `@lllogs/server` from `packages/web/`).
 - `index.html`: keep `<div id="root">` + `/dist/main.js`; reuse the existing CSS.
 - Re-express as components, behavior-identical: the **events table** (use a headless
   `@tanstack/react-table` column model — fixed `EventRow` columns, the same colgroup widths), the **facet
@@ -202,8 +202,8 @@ modules `src/api.ts`, `src/live.ts`, `src/charts.ts`, `src/cells.ts` (the struct
 **Tests:** parity is verified by Playwright (below), not new unit tests; keep all existing
 `bun test` green. `bun run check` must pass with the new JSX tsconfig.
 
-**Acceptance:** `bun run v2:web:build` ok; `bun run check` green; existing `bun test` green.
-**Evidence (mandatory):** Playwright spec over a known fixture serving via `v2:serve`:
+**Acceptance:** `bun run web:build` ok; `bun run check` green; existing `bun test` green.
+**Evidence (mandatory):** Playwright spec over a known fixture serving via `serve`:
 - **Video:** click a `tool` facet → table filters + a chip appears → switch to Analytics tab → switch
   back → open a row drawer → close it. (Proves parity of the core flows.)
 - **Screenshots** → `docs/v2/artifacts/phase5/T-5.2-events.png`, `…-facet-active.png`,
@@ -232,7 +232,7 @@ modules `src/api.ts`, `src/live.ts`, `src/charts.ts`, `src/cells.ts` (the struct
 **Tests:** keep `bun test` green (no new units required; the virtualizer is verified by Playwright).
 `bun run check` green.
 
-**Acceptance:** `bun run v2:web:build` + `bun run check` green.
+**Acceptance:** `bun run web:build` + `bun run check` green.
 **Evidence (mandatory) — this is the headline perf proof:** Playwright over a **56k-event fixture**
 (reuse/regenerate the demo DB):
 - Assert the **DOM node count / accessibility-tree size is bounded** (low hundreds, **not** O(total) —
@@ -252,10 +252,10 @@ pattern, `AppOptions.repoRoot` — D-3.a); add `packages/server/src/query.test.t
 **Spec:** `POST /api/query` with JSON body `{ sql: string, filter?: EventFilter, limit?: number }`.
 - Parse `filter` from the body (reuse the server's existing `EventFilter` parsing; **expand a short
   8-char `session`** like `/api/events` via `expandSession`).
-- **Guard** `sql` with `assertSelectOnly` imported from `@clogdy/shared` (the same authoritative guard
+- **Guard** `sql` with `assertSelectOnly` imported from `@lllogs/shared` (the same authoritative guard
   T-5.1 added) → on throw return **400** `{ error }` *before* spawning (instant feedback, no subprocess).
 - Spawn the analytics CLI in **`--query` mode**, mirroring `/api/stats`:
-  `Bun.spawn(["bun","run","v2:analytics","--","--db", dbPath, "--query", "--sql", sql, "--filters",
+  `Bun.spawn(["bun","run","analytics","--","--db", dbPath, "--query", "--sql", sql, "--filters",
   JSON.stringify(filter ?? {}), "--limit", String(limit ?? 1000)], { cwd: repoRoot, stdout:"pipe",
   stderr:"pipe" })`. **No DuckDB import in the server** (ground rule #3) — it only spawns the CLI.
 - **Kill-deadline timeout (10 s):** `Promise.race` the process exit against a 10 s deadline; on overrun
@@ -286,7 +286,7 @@ in tests (TS18046).
 **Spec:**
 - A **"ƒx SQL" toggle** in the query bar reveals a **CodeMirror 6** SQL editor (`@uiw/react-codemirror`
   with `@codemirror/lang-sql`; SQL highlighting + bracket matching; optionally seed autocomplete with the
-  `events` columns from `@clogdy/shared` types). **Ship CodeMirror unconditionally — there is NO bundle
+  `events` columns from `@lllogs/shared` types). **Ship CodeMirror unconditionally — there is NO bundle
   budget and NO textarea fallback** (user directive, D-5.k: bundle size is not a constraint; CodeMirror's
   UX is worth the weight). Report the final bundle size as informational only.
 - **Run** is explicit (**Cmd/Ctrl-Enter** or a Run button — never per-keystroke). On run → `postQuery({
@@ -317,7 +317,7 @@ in tests (TS18046).
 
 **Tests:** keep `bun test` green; `bun run check` green. (Behavior verified by Playwright.)
 
-**Acceptance:** `bun run v2:web:build` + `bun run check` green; report the **bundle size delta** vs the
+**Acceptance:** `bun run web:build` + `bun run check` green; report the **bundle size delta** vs the
 T-5.2 baseline (informational only — CodeMirror ships regardless; no budget gate per D-5.k).
 **Evidence (mandatory):** Playwright over a fixture:
 - **Video:** click a facet → toggle **ƒx SQL** → pick/type a **window-fn query** (`quantile_cont`) →

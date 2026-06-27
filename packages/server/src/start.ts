@@ -1,15 +1,15 @@
 #!/usr/bin/env bun
-// Single entry point for clogdy v2: ensure the web bundle and SQLite DB exist,
+// Single entry point for lllogs v2: ensure the web bundle and SQLite DB exist,
 // start the live ingester (the writer), then serve the app. Replaces the
-// three-step `v2:web:build` + `v2:ingest --backfill` + `v2:serve` dance.
+// three-step `web:build` + `ingest --backfill` + `serve` dance.
 //
 // Each stage runs as its own child process via Bun.spawn, so the ground rule
 // "SQLite is linked once per process" holds: the ingester child writes via
 // bun:sqlite, the server child reads via bun:sqlite, and neither loads DuckDB.
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { resolvePaths } from "@clogdy/shared";
-import { nodeLogger } from "@clogdy/shared/node";
+import { resolvePaths } from "@lllogs/shared";
+import { nodeLogger } from "@lllogs/shared/node";
 
 const argv = process.argv.slice(2);
 const has = (flag: string): boolean => argv.includes(flag);
@@ -19,14 +19,14 @@ const forceBuild = has("--build");
 const dev = has("--dev");
 if (has("--help") || has("-h")) {
   process.stdout.write(
-    `clogdy — investigate & monitor Claude Code tool usage\n\n` +
+    `lllogs — investigate & monitor Claude Code tool usage\n\n` +
       `Usage: bun start [options]   (alias: bun run v2)\n\n` +
       `  --dev        rebuild the web bundle on source changes (then refresh)\n` +
       `  --reset      rebuild the DB from scratch before serving\n` +
       `  --no-watch   don't tail for new transcripts (serve a static snapshot)\n` +
       `  --build      force-rebuild the web bundle even if present\n` +
       `  --help       show this help\n\n` +
-      `Env: CLOGDY_DB, CLOGDY_ROOT, CLOGDY_PORT (default 7331)\n`,
+      `Env: LLLOGS_DB, LLLOGS_ROOT, LLLOGS_PORT (default 7331)\n`,
   );
   process.exit(0);
 }
@@ -35,7 +35,7 @@ const repoRoot = resolve(import.meta.dir, "../../..");
 const paths = resolvePaths({});
 const webDistMain = resolve(import.meta.dir, "../../web/dist/main.js");
 const log = (msg: string): void => {
-  process.stdout.write(`clogdy ▸ ${msg}\n`);
+  process.stdout.write(`lllogs ▸ ${msg}\n`);
 };
 // pino logger for structured failure events (the `log` helper above stays the human banner).
 const logger = nodeLogger("launcher");

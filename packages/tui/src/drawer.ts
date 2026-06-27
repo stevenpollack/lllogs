@@ -1,10 +1,10 @@
-import type { EventRow } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
 import {
   splitBashCommand,
   formatToolInput,
   resultLines,
   reconstructUnifiedDiff,
-} from "@clogdy/shared";
+} from "@lllogs/shared";
 import { fmtTime } from "./columns";
 
 /** One rendered drawer line. `color` is an Ink color name. */
@@ -42,7 +42,7 @@ function colorForDiff(line: string): string | undefined {
  * tool input (Bash split into sub-commands; other tools via the shared
  * formatToolInput), a colored unified diff (reconstructed from the raw line) or
  * the colored result lines, and any prompt/thinking/assistant text. Reuses the
- * @clogdy/shared render helpers wholesale — pure, never throws.
+ * @lllogs/shared render helpers wholesale — pure, never throws.
  */
 export function buildDrawerLines(e: EventRow): DrawerLine[] {
   const out: DrawerLine[] = [];

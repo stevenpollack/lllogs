@@ -1,5 +1,5 @@
-import type { EventFilter, Facets } from "@clogdy/shared";
-import { asArray } from "@clogdy/shared";
+import type { EventFilter, Facets } from "@lllogs/shared";
+import { asArray } from "@lllogs/shared";
 import { FACET_DIMS, type FacetDim } from "./filters";
 
 /** One navigable row in the facet pane: a dimension value with its count + selection. */

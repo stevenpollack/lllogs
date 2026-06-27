@@ -3,7 +3,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { defaultDbPath, defaultRoot, resolvePaths } from "./config";
 
-const ENV_KEYS = ["CLOGDY_DB", "CLOGDY_ROOT", "XDG_DATA_HOME"] as const;
+const ENV_KEYS = ["LLLOGS_DB", "LLLOGS_ROOT", "XDG_DATA_HOME"] as const;
 let saved: Record<string, string | undefined>;
 
 beforeEach(() => {
@@ -21,36 +21,36 @@ afterEach(() => {
 });
 
 describe("defaults", () => {
-  it("defaultDbPath matches ~/.local/share/clogdy/clogdy.db", () => {
-    expect(defaultDbPath()).toBe(join(homedir(), ".local", "share", "clogdy", "clogdy.db"));
+  it("defaultDbPath matches ~/.local/share/lllogs/lllogs.db", () => {
+    expect(defaultDbPath()).toBe(join(homedir(), ".local", "share", "lllogs", "lllogs.db"));
   });
   it("XDG_DATA_HOME overrides the share dir", () => {
     process.env.XDG_DATA_HOME = "/data";
-    expect(defaultDbPath()).toBe(join("/data", "clogdy", "clogdy.db"));
+    expect(defaultDbPath()).toBe(join("/data", "lllogs", "lllogs.db"));
   });
-  it("CLOGDY_DB beats XDG default", () => {
-    process.env.CLOGDY_DB = "/custom/x.db";
+  it("LLLOGS_DB beats XDG default", () => {
+    process.env.LLLOGS_DB = "/custom/x.db";
     expect(defaultDbPath()).toBe("/custom/x.db");
   });
   it("defaultRoot matches ~/.claude/projects", () => {
     expect(defaultRoot()).toBe(join(homedir(), ".claude", "projects"));
   });
-  it("CLOGDY_ROOT overrides root default", () => {
-    process.env.CLOGDY_ROOT = "/r";
+  it("LLLOGS_ROOT overrides root default", () => {
+    process.env.LLLOGS_ROOT = "/r";
     expect(defaultRoot()).toBe("/r");
   });
 });
 
 describe("resolvePaths precedence", () => {
   it("explicit arg beats env", () => {
-    process.env.CLOGDY_DB = "/env/db";
-    process.env.CLOGDY_ROOT = "/env/root";
+    process.env.LLLOGS_DB = "/env/db";
+    process.env.LLLOGS_ROOT = "/env/root";
     const p = resolvePaths({ db: "/arg/db", root: "/arg/root" });
     expect(p).toEqual({ db: "/arg/db", root: "/arg/root" });
   });
   it("env beats default when no arg", () => {
-    process.env.CLOGDY_DB = "/env/db";
-    process.env.CLOGDY_ROOT = "/env/root";
+    process.env.LLLOGS_DB = "/env/db";
+    process.env.LLLOGS_ROOT = "/env/root";
     expect(resolvePaths()).toEqual({ db: "/env/db", root: "/env/root" });
   });
   it("falls back to defaults", () => {

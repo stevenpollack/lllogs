@@ -24,5 +24,5 @@ React 19.2.7, prod (minified) bundle. Browser console clean apart from a benign
 | `04-drawer-prism-command.png` | `prism-react-renderer` Bash highlighting + JSON-view input (`timeout: 60000` typed) |
 
 Gate (from the Integrate step): `bun run check` green (6 workspaces),
-`bun run v2:web:build` OK (`dist/main.js` ≈ 1.11 MiB minified), `bun test`
+`bun run web:build` OK (`dist/main.js` ≈ 1.11 MiB minified), `bun test`
 265 pass / 0 fail.

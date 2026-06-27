@@ -10,8 +10,8 @@ import {
   type EventFilter,
   type EventKind,
   type EventRow,
-} from "@clogdy/shared";
-import { nodeLogger } from "@clogdy/shared/node";
+} from "@lllogs/shared";
+import { nodeLogger } from "@lllogs/shared/node";
 import { expandSession, maxEventId, queryEvents, queryFacets } from "./queries";
 
 type AppEnv = { Variables: { log: Logger } };
@@ -280,7 +280,7 @@ export function createApp(opts: AppOptions): Hono<AppEnv> {
       [
         "bun",
         "run",
-        "v2:analytics",
+        "analytics",
         "--",
         "--db",
         dbPath,
@@ -386,7 +386,7 @@ export function createApp(opts: AppOptions): Hono<AppEnv> {
       [
         "bun",
         "run",
-        "v2:analytics",
+        "analytics",
         "--",
         "--db",
         dbPath,

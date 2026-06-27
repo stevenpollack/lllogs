@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { computeTiles, mergeAppend, streamUrl } from "./live";
-import type { EventRow } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
 
 // ---------------------------------------------------------------------------
 // mergeAppend

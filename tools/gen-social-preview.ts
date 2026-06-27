@@ -93,7 +93,7 @@ function starburst(cx: number, cy: number, rOuter: number, fill: string, opacity
 
 type Seg = { t: string; c: string };
 
-// Mock terminal card streaming clogdy-style tool-call log lines (dark in both themes).
+// Mock terminal card streaming lllogs-style tool-call log lines (dark in both themes).
 function card(t: Theme): string {
   const cx = 664;
   const cy = 132;

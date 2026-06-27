@@ -2,7 +2,7 @@
  * T-5.1 query.test.ts -- tests for runQuery (DuckDB process; never imports bun:sqlite).
  *
  * GROUND RULE #3: this file loads DuckDB. It MUST NOT import bun:sqlite or
- * @clogdy/ingest. The fixture DB is built by SPAWNING the ingest CLI in a
+ * @lllogs/ingest. The fixture DB is built by SPAWNING the ingest CLI in a
  * separate child process, then DuckDB opens it READ_ONLY here.
  *
  * Note on getRowsJson() value types:
@@ -20,8 +20,8 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { EventFilter } from "@clogdy/shared";
-import { ingestFixture, transcriptLine as line } from "@clogdy/shared/testing";
+import type { EventFilter } from "@lllogs/shared";
+import { ingestFixture, transcriptLine as line } from "@lllogs/shared/testing";
 import { runQuery, withDuck } from "./duck";
 
 // Fixed epoch for deterministic hand-computation.
@@ -104,7 +104,7 @@ let tmpDir: string;
 let tmpDb: string;
 
 beforeAll(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), "clogdy-query-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "lllogs-query-"));
   const tree = join(tmpDir, "tree");
   // Project directories: basename(cwd) determines the project name.
   const xDir = join(tree, "projX-slug");

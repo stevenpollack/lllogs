@@ -1,5 +1,5 @@
 // Test-only fixture helpers, shared by the analytics + server (and ingest) test
-// suites. Reached via the `@clogdy/shared/testing` subpath (NOT the barrel), so it
+// suites. Reached via the `@lllogs/shared/testing` subpath (NOT the barrel), so it
 // never enters production code or the web bundle. Factored out of ~7 near-identical
 // copies of the transcript-line builder + ingest-CLI spawn boilerplate.
 
@@ -16,7 +16,7 @@ const REPO_ROOT = resolve(import.meta.dir, "../../..");
  */
 export function ingestFixture(opts: { root: string; db: string }): void {
   const res = Bun.spawnSync(
-    ["bun", "run", "v2:ingest", "--backfill", "--root", opts.root, "--db", opts.db],
+    ["bun", "run", "ingest", "--backfill", "--root", opts.root, "--db", opts.db],
     { cwd: REPO_ROOT },
   );
   if (res.exitCode !== 0) {

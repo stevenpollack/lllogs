@@ -55,7 +55,7 @@ test("facet pane toggles a dimension filter and the table refilters", async () =
   expect(pane).toContain("Bash");
   expect(pane).toContain("Read");
 
-  // Items: project:clogdy, session:…, tool:Bash, tool:Read, kind:tool_use, role:assistant.
+  // Items: project:lllogs, session:…, tool:Bash, tool:Read, kind:tool_use, role:assistant.
   // Cursor starts at 0; two downs land on tool:Bash (count-DESC, so the first tool).
   stdin.write("j");
   await tick();

@@ -13,7 +13,7 @@ Replace Logdy with a small, self-contained pipeline we own end to end:
 2. **One ingester process** owns writes. It reuses `follow.ts`'s polling offset-tailer, runs each line through a hardened port of `flatten.ts`, and does **batched INSERTs (every ~250–500 ms or N lines) into a single SQLite database in WAL mode**. One event row per content block.
 3. **SQLite WAL is the live store.** It gives us exactly what Logdy couldn't: the full corpus on disk, real indexes, server-side `GROUP BY`, and—crucially—**many concurrent readers alongside the one writer** without blocking.
 4. **DuckDB is the analytics engine, used read-only.** For heavy whole-corpus aggregation we either `ATTACH` the SQLite file `(TYPE sqlite, READ_ONLY)` or, for the largest historical sweeps, scan the JSONL tree directly with `read_json_auto`. DuckDB is *not* in the write path and never holds the SQLite lock for writes.
-5. **UI = a bespoke small local web app** (Bun/Hono HTTP server + a thin SPA). Two views over the same store: a **filterable past-investigation table** (paged SQL queries with facet sidebars that are now *accurate* because they're computed server-side over the whole corpus) and a **live aggregate dashboard** (per-tool counts, error rate, latency) that **polls `WHERE rowid > :last`** every ~1 s. The existing **`@clogdy/tui` Ink picker** becomes the scope selector (which projects/sessions to load) and an optional terminal-native live view.
+5. **UI = a bespoke small local web app** (Bun/Hono HTTP server + a thin SPA). Two views over the same store: a **filterable past-investigation table** (paged SQL queries with facet sidebars that are now *accurate* because they're computed server-side over the whole corpus) and a **live aggregate dashboard** (per-tool counts, error rate, latency) that **polls `WHERE rowid > :last`** every ~1 s. The existing **`@lllogs/tui` Ink picker** becomes the scope selector (which projects/sessions to load) and an optional terminal-native live view.
 6. **MVP slice:** ingester + SQLite schema + one read-only HTTP endpoint + a flat HTML table with facets. That alone beats Logdy on the two things that hurt most (no backlog cap, accurate facets). DuckDB and live dashboards layer on after.
 
 This is more moving parts than "DuckDB scans JSONL on every refresh," and that simpler alternative is genuinely viable for a single-user tool (see §7). The SQLite layer earns its keep only because of **real-time monitoring** (concurrent reader+writer, cheap incremental `rowid` polling) and **indexed point lookups** (jump to one session/correlation). If live monitoring were dropped, I'd drop SQLite too.
@@ -230,7 +230,7 @@ The two jobs — **filterable past-investigation table** and **live aggregate da
 | **Bespoke local web app** (Bun + Hono server, vanilla/Preact SPA, SSE) | Server-side SQL paging + accurate server-computed facets | SSE tail + tiles | Medium | **Recommended.** Total control; fixes every Logdy limitation; ~one server file + one page. |
 | Embed Grafana / Metabase / Superset over DuckDB or SQLite | Strong filtered tables | Strong dashboards/alerts | Low-config but heavy | Overkill + a Java/Docker dependency for a single-user CLI tool. Good if multi-user/alerting later. |
 | Jupyter / marimo notebook over DuckDB | Ad-hoc, code-driven | Weak live | Low | Great for exploratory analysis, poor as an always-on monitor. Keep as a *companion*, not the product. |
-| **Ink TUI** (extend existing `@clogdy/tui`) | Scrolling filtered table in terminal | Live counters in terminal | Low (foundation exists) | **Recommended as the terminal-native live view** and scope picker. |
+| **Ink TUI** (extend existing `@lllogs/tui`) | Scrolling filtered table in terminal | Live counters in terminal | Low (foundation exists) | **Recommended as the terminal-native live view** and scope picker. |
 | Keep Logdy | — | — | — | No: it's the thing we're replacing; backlog cap + facets-over-delivered are unfixable from config. |
 
 **Recommendation: bespoke web app as primary, Ink TUI as companion.** A Bun HTTP server (Hono or bare `Bun.serve`) exposes:
@@ -241,7 +241,7 @@ The two jobs — **filterable past-investigation table** and **live aggregate da
 
 The SPA is a filterable table + a facet sidebar + a small tiles strip — deliberately small, no framework required. We reimplement the *good* parts of the audit columns (the command splitter, the diff/stderr coloring, correlation coloring) as plain client-side render functions — and now without Logdy's `innerHTML`-no-sanitization footgun, since we control the renderer (escape or use text nodes).
 
-**Where `@clogdy/tui` fits.** It already scans sessions (`scanSessions`) and picks projects/sessions via Ink. In the new design it becomes (a) the **scope selector** — choose which sessions the ingester backfills/follows — and optionally (b) a **terminal live monitor**: same `WHERE id > :lastId` poll, rendered as a scrolling table + counters in the terminal for users who live in a shell. It and the web app read the same SQLite store; no coordination needed (WAL multi-reader).
+**Where `@lllogs/tui` fits.** It already scans sessions (`scanSessions`) and picks projects/sessions via Ink. In the new design it becomes (a) the **scope selector** — choose which sessions the ingester backfills/follows — and optionally (b) a **terminal live monitor**: same `WHERE id > :lastId` poll, rendered as a scrolling table + counters in the terminal for users who live in a shell. It and the web app read the same SQLite store; no coordination needed (WAL multi-reader).
 
 ---
 
@@ -251,7 +251,7 @@ The SPA is a filterable table + a facet sidebar + a small tiles strip — delibe
 - `scripts/follow.ts` → the ingester's tailer (swap stdout sink for the batch buffer). Highest-value reuse.
 - `src/middlewares/flatten.ts` → the parse/normalize function. It stops being a "self-contained Logdy handler" (that constraint dies with Logdy) and becomes an ordinary, testable module producing `event` rows. Drop the inlining gymnastics; share helpers freely.
 - `scripts/lib/sessions.ts` (`scanSessions`, `matchesLine`, `makeFileMatcher`, `collapseSelection`) → session discovery + scoping for backfill and the picker.
-- `@clogdy/tui` (`picker.tsx`) → scope selector + optional TUI live view.
+- `@lllogs/tui` (`picker.tsx`) → scope selector + optional TUI live view.
 - All transcript-schema knowledge in `src/transcript.ts` → the row-mapping types.
 
 **New:** SQLite schema + `bun:sqlite` writer with batching/cursor; the DuckDB attach/query layer; the HTTP/SSE server; the SPA. Plus a render-helpers module (command splitter, diff coloring) ported from `audit.ts`.

@@ -2,16 +2,16 @@ import { test, expect } from "bun:test";
 import { mkdtempSync, mkdirSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { parseLogLines, selectEvents } from "@clogdy/shared";
+import { parseLogLines, selectEvents } from "@lllogs/shared";
 
 const repoRoot = resolve(import.meta.dir, "..", "..", "..");
 
-// The launcher spawns `v2:ingest --watch` with CLOGDY_LOG_DIR set + stderr
+// The launcher spawns `ingest --watch` with LLLOGS_LOG_DIR set + stderr
 // dropped so the writer's pino output never corrupts the Ink TTY. This asserts
-// that contract on the underlying CLI: with CLOGDY_LOG_DIR set, structured logs
+// that contract on the underlying CLI: with LLLOGS_LOG_DIR set, structured logs
 // land in the file and stderr stays clean.
-test("ingester logs go to CLOGDY_LOG_DIR, not stderr (TTY stays clean)", async () => {
-  const dir = mkdtempSync(join(tmpdir(), "clogdy-tui-log-"));
+test("ingester logs go to LLLOGS_LOG_DIR, not stderr (TTY stays clean)", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "lllogs-tui-log-"));
   const db = join(dir, "test.db");
   const root = join(dir, "projects");
   const logDir = join(dir, "logs");
@@ -23,7 +23,7 @@ test("ingester logs go to CLOGDY_LOG_DIR, not stderr (TTY stays clean)", async (
       cwd: repoRoot,
       stdout: "pipe",
       stderr: "pipe",
-      env: { ...process.env, CLOGDY_LOG_DIR: logDir, CLOGDY_LOG_LEVEL: "info" },
+      env: { ...process.env, LLLOGS_LOG_DIR: logDir, LLLOGS_LOG_LEVEL: "info" },
     },
   );
   const stderr = await new Response(proc.stderr).text();

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useReducer, useRef } from "react";
 import type { VisibilityState } from "@tanstack/react-table";
-import type { EventFilter, EventRow, Facets } from "@clogdy/shared";
-import { asArray, assertSelectOnly } from "@clogdy/shared";
+import type { EventFilter, EventRow, Facets } from "@lllogs/shared";
+import { asArray, assertSelectOnly } from "@lllogs/shared";
 
 // Facet dimensions that support multiple selected values (OR within a dimension).
 const MULTI_DIMS = ["project", "session", "tool", "kind", "role", "error"] as const;
@@ -29,7 +29,7 @@ import { usePersistedState } from "../usePersistedState";
 
 // Events-table column hide/show key. A missing id defaults to visible (react-table
 // treats absent keys as true), so a newly-added column shows by default.
-const COL_VIS_KEY = "clogdy.eventsColVisibility.v1";
+const COL_VIS_KEY = "lllogs.eventsColVisibility.v1";
 import { Drawer } from "./Drawer";
 import { AnalyticsView } from "./AnalyticsView";
 import SqlEditor from "./SqlEditor";

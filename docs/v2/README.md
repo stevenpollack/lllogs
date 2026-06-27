@@ -1,4 +1,4 @@
-# clogdy v2 — build plan
+# lllogs v2 — build plan
 
 Next iteration: a local tool to **investigate past** and **monitor current** Claude Code tool usage,
 replacing the Logdy proof of concept. Architecture: JSONL (source of truth) → one ingester → **SQLite

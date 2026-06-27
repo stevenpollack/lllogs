@@ -7,7 +7,7 @@ Set Width 1500
 Set Height 850
 Set Padding 12
 
-Type "bun run v2:tui -- --no-ingest"  Enter
+Type "bun run tui -- --no-ingest"  Enter
 Sleep 2.5s
 Screenshot docs/v2/artifacts/tui/monitor-01-table.png
 

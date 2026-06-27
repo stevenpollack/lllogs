@@ -8,7 +8,7 @@ Set Width 720
 Set Height 620
 Set Padding 10
 
-Type "bun run v2:tui -- --no-ingest"  Enter
+Type "bun run tui -- --no-ingest"  Enter
 Sleep 2.5s
 Screenshot docs/v2/artifacts/tui/narrow-01-table.png
 

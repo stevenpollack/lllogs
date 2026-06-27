@@ -3,7 +3,7 @@ import type { Database } from "bun:sqlite";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { FlatEvent } from "@clogdy/shared";
+import type { FlatEvent } from "@lllogs/shared";
 import { openDb } from "./db";
 import { makeWriter } from "./writer";
 
@@ -39,7 +39,7 @@ function ev(over: Partial<FlatEvent>): FlatEvent {
 }
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-writer-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-writer-"));
   db = openDb(join(dir, "w.db"));
 });
 afterEach(() => {

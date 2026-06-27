@@ -1,4 +1,4 @@
-import type { EventRow } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
 
 /**
  * The live event buffer + view position. Rows are kept ascending by id; the live

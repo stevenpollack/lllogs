@@ -1,8 +1,8 @@
 import { DuckDBInstance } from "@duckdb/node-api";
 import type { DuckDBConnection } from "@duckdb/node-api";
 import type { Logger } from "pino";
-import type { EventFilter } from "@clogdy/shared";
-import { asArray, assertSelectOnly, stripSqlComments } from "@clogdy/shared";
+import type { EventFilter } from "@lllogs/shared";
+import { asArray, assertSelectOnly, stripSqlComments } from "@lllogs/shared";
 
 /**
  * The value types we bind as DuckDB positional parameters. DuckDB's `run(sql,

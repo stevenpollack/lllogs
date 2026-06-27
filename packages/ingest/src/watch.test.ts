@@ -109,7 +109,7 @@ async function pollUntilCount(db: ReturnType<typeof openDb>, expected: number): 
 }
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-watch-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-watch-"));
   root = join(dir, "projects");
   dbPath = join(dir, "db", "w.db");
 });

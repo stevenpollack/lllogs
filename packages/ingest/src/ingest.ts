@@ -1,7 +1,7 @@
 import type { Database } from "bun:sqlite";
 import { statSync } from "node:fs";
-import { flattenLine } from "@clogdy/shared";
-import { nodeLogger } from "@clogdy/shared/node";
+import { flattenLine } from "@lllogs/shared";
+import { nodeLogger } from "@lllogs/shared/node";
 import type { Logger } from "pino";
 import { tail } from "./tailer";
 import { makeWriter } from "./writer";

@@ -1,4 +1,4 @@
-clogdy ▸ LIVE ● · 10/5m
+lllogs ▸ LIVE ● · 10/5m
 TIME           PROJECT          SESSION  KIND        TOOL
 06-27 20:24:50 web              sess-aaa prompt
 06-27 20:25:10 web              sess-aaa tool_use    Read

@@ -15,13 +15,13 @@ function expandHome(p: string): string {
 
 export function defaultDbPath(): string {
   return (
-    process.env.CLOGDY_DB ??
-    join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local", "share"), "clogdy", "clogdy.db")
+    process.env.LLLOGS_DB ??
+    join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local", "share"), "lllogs", "lllogs.db")
   );
 }
 
 export function defaultRoot(): string {
-  return process.env.CLOGDY_ROOT ?? join(homedir(), ".claude", "projects");
+  return process.env.LLLOGS_ROOT ?? join(homedir(), ".claude", "projects");
 }
 
 /**

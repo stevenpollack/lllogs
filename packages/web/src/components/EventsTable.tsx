@@ -13,8 +13,8 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
-import type { EventRow } from "@clogdy/shared";
-import { splitBashCommand, resultLines, formatToolInput } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
+import { splitBashCommand, resultLines, formatToolInput } from "@lllogs/shared";
 import { ResizableColgroup, HeaderCell } from "./ResizableColumns";
 import { usePersistedState } from "../usePersistedState";
 
@@ -166,10 +166,10 @@ export const EVENT_COLUMNS: { id: string; label: string }[] = columns.map((c) =>
 }));
 
 // Persist user-dragged column widths across remounts (tab switches) and reloads.
-const COL_SIZING_KEY = "clogdy.eventsColSizing.v1";
+const COL_SIZING_KEY = "lllogs.eventsColSizing.v1";
 // Persist drag-to-reorder column order the same way ([] = react-table's
 // definition order; the first reorder writes the full on-screen order).
-const COL_ORDER_KEY = "clogdy.eventsColOrder.v1";
+const COL_ORDER_KEY = "lllogs.eventsColOrder.v1";
 
 function loadColumnSizing(): ColumnSizingState {
   try {

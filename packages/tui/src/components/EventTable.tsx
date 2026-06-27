@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text } from "ink";
-import type { EventRow } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
 import type { ColumnDef } from "../columns";
 import { layoutColumns, pad } from "../layout";
 

@@ -3,8 +3,8 @@ import type { Database } from "bun:sqlite";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { FlatEvent } from "@clogdy/shared";
-import { makeWriter, openDb } from "@clogdy/ingest";
+import type { FlatEvent } from "@lllogs/shared";
+import { makeWriter, openDb } from "@lllogs/ingest";
 import { expandSession, maxEventId, queryEvents, queryFacets } from "./queries";
 
 let dir: string;
@@ -39,7 +39,7 @@ function ev(over: Partial<FlatEvent>): FlatEvent {
 }
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-q-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-q-"));
   db = openDb(join(dir, "q.db"));
   const w = makeWriter(db);
   // 5 events:

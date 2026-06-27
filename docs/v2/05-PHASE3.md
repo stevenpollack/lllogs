@@ -11,7 +11,7 @@ Hence analytics is a CLI subprocess.
 
 ---
 
-## T-3.1 — `@clogdy/analytics`: DuckDB query CLI (PG0, needs 1.1)
+## T-3.1 — `@lllogs/analytics`: DuckDB query CLI (PG0, needs 1.1)
 
 **Files:** `packages/analytics/src/duck.ts` (connection + metric queries), `packages/analytics/src/query.ts`
 (CLI), `packages/analytics/src/duck.test.ts`.
@@ -41,16 +41,16 @@ tool_use/result pair with known ts gap; run each metric via `withDuck`; assert `
 the DuckDB side, but the test may use `bun:sqlite` to *build the fixture* in a separate step before
 opening DuckDB — keep them sequential, not concurrent handles in the same statement. If even that trips
 the double-link warning in-process, build the fixture in a tiny `Bun.spawn`'d helper or via the ingest
-CLI, then run DuckDB. Prefer: build fixture by shelling `v2:ingest --backfill` on a temp tree, then run
+CLI, then run DuckDB. Prefer: build fixture by shelling `ingest --backfill` on a temp tree, then run
 DuckDB in the test process.)
 
 > **Important for the agent:** if `bun:sqlite` and `@duckdb/node-api` loaded in the *same test process*
 > throws the multiple-SQLite-link error, that's ground rule #3 biting in a test. Resolve by generating
-> the fixture DB via `Bun.spawnSync(["bun","run","v2:ingest","--backfill","--root",tmpTree,"--db",tmpDb])`
+> the fixture DB via `Bun.spawnSync(["bun","run","ingest","--backfill","--root",tmpTree,"--db",tmpDb])`
 > (separate process) and then only opening DuckDB in the test process. Document which approach you used.
 
 **Acceptance:** `bun test packages/analytics/src/duck.test.ts` green; `bun run check` green; manual:
-`bun run v2:analytics -- --db /tmp/clogdy-smoke.db --metric toolCounts` prints JSON.
+`bun run analytics -- --db /tmp/lllogs-smoke.db --metric toolCounts` prints JSON.
 
 ---
 
@@ -59,7 +59,7 @@ DuckDB in the test process.)
 **Files:** edit `packages/server/src/app.ts` (replace 501 stub); add `packages/server/src/stats.test.ts`.
 
 **Spec:** `GET /api/stats?metric=<name>&<filter params>` → validate `metric` ∈ the five names (else 400);
-spawn the analytics CLI: `Bun.spawn(["bun","run","v2:analytics","--","--db", dbPath, "--metric", metric, "--filters", JSON.stringify(filter)], {cwd: repoRoot, stdout:"pipe", stderr:"pipe"})`; await; on exit 0
+spawn the analytics CLI: `Bun.spawn(["bun","run","analytics","--","--db", dbPath, "--metric", metric, "--filters", JSON.stringify(filter)], {cwd: repoRoot, stdout:"pipe", stderr:"pipe"})`; await; on exit 0
 parse stdout JSON and return it; on nonzero return 500 `{error: stderr}`. `dbPath` = the path the server
 opened (track it). Add a short timeout (e.g. 20s) → 504 on overrun. **No DuckDB import in the server** —
 it only spawns the CLI (ground rule #3).
@@ -82,7 +82,7 @@ filter): a tool-counts bar list, an error-rate gauge/number, a latency table (to
 project rollup table, and a simple time-buckets sparkline/bar (plain SVG or divs — no chart dep).
 Keep it dependency-free; tiny SVG helpers in `charts.ts`. Refresh on filter change.
 
-**Acceptance:** `bun run v2:web:build` ok; `bun run check` green; manual: the Analytics tab shows correct
+**Acceptance:** `bun run web:build` ok; `bun run check` green; manual: the Analytics tab shows correct
 aggregates vs the smoke DB.
 
 ---

@@ -1,5 +1,5 @@
-import type { EventFilter } from "@clogdy/shared";
-import { asArray } from "@clogdy/shared";
+import type { EventFilter } from "@lllogs/shared";
+import { asArray } from "@lllogs/shared";
 import { shortSession } from "./columns";
 
 /** The multi-value facet dimensions, in display order. */

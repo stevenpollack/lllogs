@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 // T-5.3 evidence: virtualized events table DOM is bounded even on the 56k corpus.
 // Run with:
-//   CLOGDY_FIXTURE_DB=/tmp/.../scratchpad/demo.db bunx playwright test t5.3-virtualization
+//   LLLOGS_FIXTURE_DB=/tmp/.../scratchpad/demo.db bunx playwright test t5.3-virtualization
 
 // `import.meta.dir` is Bun-only; the Playwright runner loads this under Node.
 const HERE = fileURLToPath(new URL(".", import.meta.url));

@@ -3,8 +3,8 @@ import type { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { FlatEvent } from "@clogdy/shared";
-import { makeWriter, openDb } from "@clogdy/ingest";
+import type { FlatEvent } from "@lllogs/shared";
+import { makeWriter, openDb } from "@lllogs/ingest";
 import { createApp } from "./app";
 
 let dir: string;
@@ -41,7 +41,7 @@ function ev(over: Partial<FlatEvent>): FlatEvent {
 }
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-app-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-app-"));
   db = openDb(join(dir, "a.db"));
   const w = makeWriter(db);
   w.add([
@@ -69,7 +69,7 @@ beforeEach(() => {
 
   webDir = join(dir, "web");
   mkdirSync(join(webDir, "dist"), { recursive: true });
-  writeFileSync(join(webDir, "index.html"), "<!doctype html><title>clogdy</title>");
+  writeFileSync(join(webDir, "index.html"), "<!doctype html><title>lllogs</title>");
   writeFileSync(join(webDir, "dist", "main.js"), "console.log('hi')");
 
   app = createApp({ db, webDir, dbPath: join(dir, "a.db") });
@@ -142,7 +142,7 @@ test("/ serves index.html bytes", async () => {
   const r = await app.request("/");
   expect(r.status).toBe(200);
   const txt = await r.text();
-  expect(txt).toContain("clogdy");
+  expect(txt).toContain("lllogs");
 });
 
 test("missing asset → 404", async () => {

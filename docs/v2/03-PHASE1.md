@@ -1,7 +1,7 @@
 # Phase 1 — MVP: investigate past, accurately
 
-Goal: a working `v2:ingest --backfill` that fills the SQLite DB from `~/.claude/projects`, and a
-`v2:serve` that exposes a filterable table with **accurate server-side facet counts over the full
+Goal: a working `ingest --backfill` that fills the SQLite DB from `~/.claude/projects`, and a
+`serve` that exposes a filterable table with **accurate server-side facet counts over the full
 corpus** — beating Logdy's ~100-row cap immediately. Read `01-CONTRACTS.md` §2/§5/§6/§8 first. Every
 task uses the subagent template from `00-ORCHESTRATION.md`; ground rules #3 and #8 are absolute.
 
@@ -11,9 +11,9 @@ task uses the subagent template from `00-ORCHESTRATION.md`; ground rules #3 and 
 
 **Files:** `packages/ingest/src/schema.ts`, `packages/ingest/src/db.ts`, `packages/ingest/src/db.test.ts`,
 and `packages/ingest/src/index.ts` (re-export every ingest module — `schema`, `db`, and `tailer`/
-`writer`/`ingest` as T-1.2–1.4 add them; `@clogdy/ingest`'s consumers — the server and the e2e test —
+`writer`/`ingest` as T-1.2–1.4 add them; `@lllogs/ingest`'s consumers — the server and the e2e test —
 import `openDb`/`makeWriter`/`runIngest` from here, so they must be exported). **Wiring:** the server and
-e2e tests that import `@clogdy/ingest` need `"@clogdy/ingest": "file:../ingest"` in `packages/server/package.json`
+e2e tests that import `@lllogs/ingest` need `"@lllogs/ingest": "file:../ingest"` in `packages/server/package.json`
 `devDependencies` (add it when you reach T-1.5/T-1.8) and a `bun install` afterward.
 
 **Spec:**
@@ -91,7 +91,7 @@ upserts (insert then update changes offset); `upsertSession` updates `last_ts` t
 
 ## T-1.4 — ingest: backfill CLI wiring (PG2, needs 1.2, 1.3, 0.2)
 
-**Goal:** the `v2:ingest` CLI: tail → flatten → write, idempotent, resumable.
+**Goal:** the `ingest` CLI: tail → flatten → write, idempotent, resumable.
 
 **Files:** `packages/ingest/src/ingest.ts` (the orchestration fn), `packages/ingest/src/cli.ts` (arg
 parse + main), `packages/ingest/src/ingest.test.ts`.
@@ -128,8 +128,8 @@ tool_use row has the right `tool`/`command`/`corr`, a tool_result row shares tha
 `runIngest` again inserts 0 new rows (idempotent); `session` table has 2 rows with correct `project`.
 
 **Acceptance:** `bun test packages/ingest/src/ingest.test.ts` green; `bun run check` green; manual:
-`bun run v2:ingest -- --backfill --db /tmp/clogdy-smoke.db` exits 0 and prints a sane count (orchestrator
-runs this against the real `~/.claude/projects`, then `sqlite3 /tmp/clogdy-smoke.db 'select count(*) from event'` > 0 — or via a tiny `bun -e` using bun:sqlite).
+`bun run ingest -- --backfill --db /tmp/lllogs-smoke.db` exits 0 and prints a sane count (orchestrator
+runs this against the real `~/.claude/projects`, then `sqlite3 /tmp/lllogs-smoke.db 'select count(*) from event'` > 0 — or via a tiny `bun -e` using bun:sqlite).
 
 ---
 
@@ -190,9 +190,9 @@ resolves an 8-char prefix and returns null on ambiguity; `maxEventId` correct.
   - On a thrown error in a handler → 500 `{error: String(err)}`; bad numeric param → 400.
 - `serve.ts`: `resolvePaths`; open DB **readonly** (`new Database(paths.db, {readonly:true})`); `webDir =
   resolve(import.meta.dir, "../../web")`; build web if `dist/main.js` missing (call `Bun.build` or
-  instruct to run `v2:web:build` — for Phase 1, if missing, log a hint and still serve index.html);
-  `Bun.serve({ port: Number(process.env.CLOGDY_PORT ?? 7331), fetch: createApp({db,webDir}).fetch })`;
-  print `clogdy v2 → http://localhost:<port>`.
+  instruct to run `web:build` — for Phase 1, if missing, log a hint and still serve index.html);
+  `Bun.serve({ port: Number(process.env.LLLOGS_PORT ?? 7331), fetch: createApp({db,webDir}).fetch })`;
+  print `lllogs v2 → http://localhost:<port>`.
 
 **Tests (`app.test.ts`):** seed a temp DB; `const app = createApp({db, webDir: <a temp dir with an index.html>})`;
 use `app.request("/healthz")`, `app.request("/api/events?tool=Bash")`, `app.request("/api/facets")` and
@@ -201,7 +201,7 @@ under strict TS and fails `bun run check` otherwise); assert `/api/events/stream
 index.html bytes and a missing asset → 404.
 
 **Acceptance:** `bun test packages/server/src/app.test.ts` green; `bun run check` green; manual:
-against the smoke DB from T-1.4, `CLOGDY_DB=/tmp/clogdy-smoke.db bun run v2:serve` boots and
+against the smoke DB from T-1.4, `LLLOGS_DB=/tmp/lllogs-smoke.db bun run serve` boots and
 `curl localhost:7331/healthz` returns events>0 and `curl 'localhost:7331/api/facets'` returns non-empty
 `tool` buckets.
 
@@ -218,7 +218,7 @@ T-1.8 and manual.)
 - `index.html`: minimal doc, a two-pane layout — left `<aside id="facets">`, right `<main>` with a
   filter bar (`<input id="q">`, active-filter chips) and a `<table id="events">` (thead with the columns
   PROJECT, SESSION, TIME, KIND, TOOL, COMMAND, ERROR, RESULT, TEXT). `<script type="module" src="/dist/main.js">`.
-- `api.ts`: typed fetch wrappers importing types from `@clogdy/shared`:
+- `api.ts`: typed fetch wrappers importing types from `@lllogs/shared`:
   `getEvents(filter): Promise<{events:EventRow[], nextAfterId:number|null}>`, `getFacets(filter): Promise<Facets>`.
   Build query strings from a filter object (skip undefined).
 - `main.ts`: a tiny app state `{ filter: EventFilter }`. On load and on any filter change:
@@ -232,7 +232,7 @@ T-1.8 and manual.)
   - Keep it dependency-free; ~200–300 lines of plain DOM is expected. No virtualization needed for MVP
     (cap the table at the fetched page(s)).
 
-**Acceptance:** `bun run v2:web:build` produces `packages/web/dist/main.js`; `bun run check` green (web
+**Acceptance:** `bun run web:build` produces `packages/web/dist/main.js`; `bun run check` green (web
 tsconfig has DOM lib). Visual correctness is checked in T-1.8 / by the user.
 
 ---

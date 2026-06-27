@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 // Import the evidence helpers from the SHARED SOURCE by relative path, not from
-// "@clogdy/shared": that barrel resolves to a raw .ts entry inside node_modules,
+// "@lllogs/shared": that barrel resolves to a raw .ts entry inside node_modules,
 // which Playwright's Node loader does not transform. `log.ts` is pure (only a
 // type-only pino import) so it loads standalone under Playwright.
 import { parseLogLines, selectEvents, type LogEntry } from "../../shared/src/log";

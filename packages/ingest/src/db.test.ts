@@ -9,8 +9,8 @@ let dir: string;
 let dbPath: string;
 
 beforeAll(() => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-db-"));
-  dbPath = join(dir, "nested", "clogdy.db");
+  dir = mkdtempSync(join(tmpdir(), "lllogs-db-"));
+  dbPath = join(dir, "nested", "lllogs.db");
 });
 
 afterAll(() => {

@@ -1,5 +1,5 @@
-import type { EventFilter, EventRow, Facets } from "@clogdy/shared";
-import { asArray } from "@clogdy/shared";
+import type { EventFilter, EventRow, Facets } from "@lllogs/shared";
+import { asArray } from "@lllogs/shared";
 import { FACET_DIMS, type FacetDim } from "./filters";
 import type { DataSource } from "./datasource";
 
@@ -15,8 +15,8 @@ export function makeRow(over: Partial<EventRow> = {}): EventRow {
     blockIdx: 0,
     parentUuid: null,
     sessionId: "sess1234deadbeef",
-    project: "clogdy",
-    cwd: "/home/u/clogdy",
+    project: "lllogs",
+    cwd: "/home/u/lllogs",
     ts: Date.parse("2026-06-27T15:04:05.000Z"),
     kind: "tool_use",
     role: "assistant",

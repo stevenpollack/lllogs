@@ -6,7 +6,7 @@ notes for phases that weren't dry-run-validated in the plan.
 ## Phase 3 — DuckDB analytics
 
 ### D-3.a — server spawn cwd / repoRoot (T-3.2)
-**Problem:** `/api/stats` must `Bun.spawn(["bun","run","v2:analytics", …], {cwd: repoRoot})`, but
+**Problem:** `/api/stats` must `Bun.spawn(["bun","run","analytics", …], {cwd: repoRoot})`, but
 `createApp` only receives `db`, `webDir`, `dbPath` — there is no `repoRoot` in `AppOptions`, and the
 stats test drives the app via `app.request(...)` (no `serve.ts`), so it can't rely on process.cwd().
 `serve.ts` derives `webDir = resolve(import.meta.dir, "../../web")`, i.e. repoRoot =
@@ -20,11 +20,11 @@ makes the test deterministic.
 
 ### D-3.b — analytics test fixtures built via spawned ingest CLI (T-3.1, T-3.2, T-3.4)
 **Problem:** ground rule #3 — a process linking `bun:sqlite` must never also load DuckDB's sqlite
-extension. The analytics duck.test.ts must open DuckDB; if it also imported `@clogdy/ingest`
+extension. The analytics duck.test.ts must open DuckDB; if it also imported `@lllogs/ingest`
 (`openDb`/`runIngest`, which use `bun:sqlite`) in the same process, that's a double SQLite link.
 **Decision:** all analytics/stats/e2e fixtures are built by **spawning** the ingest CLI in a separate
-process: `Bun.spawnSync(["bun","run","v2:ingest","--backfill","--root",tmpTree,"--db",tmpDb],{cwd:repoRoot})`,
-THEN open DuckDB in the test process. Never `import { openDb } from "@clogdy/ingest"` in a file that
+process: `Bun.spawnSync(["bun","run","ingest","--backfill","--root",tmpTree,"--db",tmpDb],{cwd:repoRoot})`,
+THEN open DuckDB in the test process. Never `import { openDb } from "@lllogs/ingest"` in a file that
 also loads DuckDB. (The server stats.test.ts / e2e-stats.test.ts use the server's bun:sqlite + spawn
 DuckDB as a child — compliant; they too build the fixture DB via the spawned ingest CLI.)
 **Spec fix:** already in PHASE3 T-3.1 note; reaffirm for T-3.2/T-3.4 — fixture DB = spawned ingest CLI.
@@ -146,7 +146,7 @@ If multi-session scoping becomes important, it's a separate task (extend `EventF
 **Problem:** the suggested `bun build tui/picker.tsx --target=bun` smoke exits 1 because Ink optionally
 imports `react-devtools-core`, which Bun's bundler can't resolve. This reproduces with the `--v2` edit
 stashed, so it is NOT caused by T-4.3.
-**Decision:** the authoritative parse/typecheck for the TUI is `bun run --filter '@clogdy/tui' check`
+**Decision:** the authoritative parse/typecheck for the TUI is `bun run --filter '@lllogs/tui' check`
 (tsc with the JSX tsconfig), which is green. The bundler smoke is not a valid gate for this package.
 
 ## Phase 5 — React/TanStack web + virtualization + facet/SQL query
@@ -224,10 +224,10 @@ from a use→result self-join to `quantile_cont(ts, 0.5)` over a single `events`
 analytical SQL runs over the facet CTE. **MVP impact:** users issuing a self-join of `events` may hit this;
 single-scan aggregates/windows (the canned examples) are unaffected. Revisit if a DuckDB upgrade fixes it.
 
-### D-5.h — `v2:serve` takes DB/port via env vars (`CLOGDY_DB`/`CLOGDY_PORT`), not flags (Phase 5 e2e harness note)
-`packages/server/src/serve.ts` resolves the DB via `resolvePaths({})` (honoring `CLOGDY_DB`, else the XDG
-default) and the port via `CLOGDY_PORT` (default 7331) — it does **not** parse `--db`/`--port` argv. The
-Playwright `webServer` (T-5.7) and any fixture-serve must set `CLOGDY_DB`/`CLOGDY_PORT` in the env, not
+### D-5.h — `serve` takes DB/port via env vars (`LLLOGS_DB`/`LLLOGS_PORT`), not flags (Phase 5 e2e harness note)
+`packages/server/src/serve.ts` resolves the DB via `resolvePaths({})` (honoring `LLLOGS_DB`, else the XDG
+default) and the port via `LLLOGS_PORT` (default 7331) — it does **not** parse `--db`/`--port` argv. The
+Playwright `webServer` (T-5.7) and any fixture-serve must set `LLLOGS_DB`/`LLLOGS_PORT` in the env, not
 pass flags. Verified serving the 56k demo.db (`events:56015`, React `#root` + `/dist/main.js` 200).
 
 ### D-5.i — Playwright specs use the `.pw.ts` suffix so `bun test` ignores them (Phase 5 e2e harness, meta-orchestrator)
@@ -264,7 +264,7 @@ passes them to `conn.runAndReadAll(sql, params)`.
 **Belt-and-suspenders (DuckDB multi-statement):** DuckDB does NOT automatically reject multi-statement SQL
 in a single `run()` / `runAndReadAll()` call. The `@duckdb/node-api` README shows an `extractStatements`
 API for iterating over multiple statements, and the C-level `duckdb_query` runs all statements in a batch.
-Therefore `assertSelectOnly` in `@clogdy/shared` is the PRIMARY (and non-redundant) protection layer —
+Therefore `assertSelectOnly` in `@lllogs/shared` is the PRIMARY (and non-redundant) protection layer —
 DuckDB itself provides no automatic multi-statement guard. Documented in a code comment in `sqlguard.ts`.
 
 **Bug fixed as part of T-5.6:** `assertSelectOnly` previously used `stripped.includes(";")` to detect
@@ -315,7 +315,7 @@ selected value; `FacetSidebar` marks a value active by set membership. Evidence:
 
 `packages/web/build.ts --watch` does an initial (un-minified, faster) build then `fs.watch`es
 `packages/web/src` and rebuilds (debounced) on every change; `index.html` is served statically so a CSS
-edit there only needs a refresh. `bun start --dev` (alias `bun run v2:dev`) spawns that watcher as a
+edit there only needs a refresh. `bun start --dev` (alias `bun run dev`) spawns that watcher as a
 child alongside the ingester + server (all torn down together on Ctrl-C). Edit a component, the bundle
 rebuilds in ~100 ms, refresh the browser to see it.
 
@@ -363,18 +363,18 @@ in-process transport.
 **Sinks / wires (the invariant):** structured logs go to **stderr or a file, never stdout**. The
 **analytics** process logs to a **file only** (never stdout *or* stderr): its stdout is the JSON-result
 wire the server `JSON.parse`s and its stderr is the error-string wire the server forwards to the user —
-both reserved. Without `CLOGDY_LOG_DIR` analytics is **silent** and the server narrates it; pino's default
+both reserved. Without `LLLOGS_LOG_DIR` analytics is **silent** and the server narrates it; pino's default
 `dest` (fd 1) is overridden to fd 2/file everywhere so a stray byte can never corrupt the data wire.
 
 **One JSONL schema** both node + browser emit via the shared `SCHEMA_OPTS`: `ts` (ISO), string `level`,
 `proc`, `pid`, `evt` (the assertable key) — `base:{proc,pid}` replaces pino's default `{pid,hostname}` so
 **no hostname** leaks into committed artifacts. Levels are **`debug` … `error` plus `silent`** — **no
-`trace`** (explicitly out of scope). Two env vars, inherited by every spawned child: `CLOGDY_LOG_LEVEL`
-(default `info`) and `CLOGDY_LOG_DIR` (per-process `<proc>[-<pid>].jsonl`). The node sink is reached only
-via the `@clogdy/shared/node` subpath (never the barrel) so pino's `node:fs`/`sonic-boom` stay out of the
+`trace`** (explicitly out of scope). Two env vars, inherited by every spawned child: `LLLOGS_LOG_LEVEL`
+(default `info`) and `LLLOGS_LOG_DIR` (per-process `<proc>[-<pid>].jsonl`). The node sink is reached only
+via the `@lllogs/shared/node` subpath (never the barrel) so pino's `node:fs`/`sonic-boom` stay out of the
 web bundle (verified: `dist/main.js` has zero `sonic-boom`/`thread-stream`/`node:fs`).
 
 **Spike result:** the pino-on-Bun spike **passed** on Bun 1.3.14 — sync-fd output is byte-clean, the
 analytics-silent path leaks nothing to stdout even at `debug`, circular/`Error` never throw (`"[Circular]"`
-/ serialized `message`+`stack`), and the `@clogdy/shared/node` subpath resolves under the `file:` workspace
+/ serialized `message`+`stack`), and the `@lllogs/shared/node` subpath resolves under the `file:` workspace
 dep. The hand-rolled-core fallback in the plan was therefore not needed.

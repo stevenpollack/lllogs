@@ -1,4 +1,4 @@
-clogdy ▸ LIVE ● · 10/5m
+lllogs ▸ LIVE ● · 10/5m
 {
   "toolUseResult": {
     "filePath": "src/server.ts",

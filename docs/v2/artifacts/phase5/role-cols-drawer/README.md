@@ -23,7 +23,7 @@ Clicking `role = user` (sidebar) filters the grid (chip `role: user ✕`, URL `?
 ## 3. Re-arrangeable columns — `role-03-reordered.png`
 Dragging the `ROLE` header onto `PROJECT` moves it: order becomes `ROLE, PROJECT, SESSION, TIME, KIND,
 TOOL, …`, data cells following. Native HTML5 DnD (no new dependency); order persists to
-`localStorage["clogdy.eventsColOrder.v1"]`. Resizing/sorting still work; the SQL-result grid (which omits
+`localStorage["lllogs.eventsColOrder.v1"]`. Resizing/sorting still work; the SQL-result grid (which omits
 the `onReorder` prop) is unaffected.
 
 ## 4. Full-row drawer — `role-04-drawer-zoom.png`

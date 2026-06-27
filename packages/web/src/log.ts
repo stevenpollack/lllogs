@@ -1,5 +1,5 @@
 import pino from "pino";
-import { LOG_LEVELS, type LogLevel } from "@clogdy/shared";
+import { LOG_LEVELS, type LogLevel } from "@lllogs/shared";
 
 const LEVEL_LABEL: Record<number, LogLevel> = { 20: "debug", 30: "info", 40: "warn", 50: "error" };
 
@@ -12,7 +12,7 @@ function resolveLevel(): LogLevel {
   }
   if (!v) {
     try {
-      v = window.localStorage.getItem("clogdy:log");
+      v = window.localStorage.getItem("lllogs:log");
     } catch {
       /* noop */
     }

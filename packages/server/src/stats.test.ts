@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { ingestFixture, transcriptLine } from "@clogdy/shared/testing";
+import { ingestFixture, transcriptLine } from "@lllogs/shared/testing";
 import { createApp } from "./app";
 
 // GROUND RULE #3: this test process uses bun:sqlite (via createApp's Database)
@@ -63,7 +63,7 @@ let db: Database;
 let app: ReturnType<typeof createApp>;
 
 beforeAll(() => {
-  tmpDir = mkdtempSync(join(tmpdir(), "clogdy-stats-"));
+  tmpDir = mkdtempSync(join(tmpdir(), "lllogs-stats-"));
   const tree = join(tmpDir, "tree");
   const projDir = join(tree, "project-slug");
   mkdirSync(projDir, { recursive: true });
@@ -94,7 +94,7 @@ describe("/api/stats proxy → analytics CLI", () => {
       [
         "bun",
         "run",
-        "v2:analytics",
+        "analytics",
         "--",
         "--db",
         dbPath,

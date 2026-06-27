@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
-import type { EventFilter } from "@clogdy/shared";
-import { assertSelectOnly } from "@clogdy/shared";
-import { nodeLogger } from "@clogdy/shared/node";
+import type { EventFilter } from "@lllogs/shared";
+import { assertSelectOnly } from "@lllogs/shared";
+import { nodeLogger } from "@lllogs/shared/node";
 import { buildQuery, isMetricName, runMetric, runQuery, withDuck } from "./duck";
 
 interface MetricArgs {
@@ -67,7 +67,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 async function main(): Promise<void> {
-  // File-only logger: silent unless CLOGDY_LOG_DIR is set, and NEVER stdout/stderr —
+  // File-only logger: silent unless LLLOGS_LOG_DIR is set, and NEVER stdout/stderr —
   // stdout is the JSON-result wire and stderr is the error-string wire the server reads.
   const log = nodeLogger("analytics");
 
@@ -75,7 +75,7 @@ async function main(): Promise<void> {
   try {
     args = parseArgs(process.argv.slice(2));
   } catch (e) {
-    process.stderr.write(`v2:analytics: ${(e as Error).message}\n`);
+    process.stderr.write(`analytics: ${(e as Error).message}\n`);
     process.exit(1);
   }
 
@@ -102,7 +102,7 @@ async function main(): Promise<void> {
     try {
       assertSelectOnly(args.sql);
     } catch (e) {
-      process.stderr.write(`v2:analytics: ${(e as Error).message}\n`);
+      process.stderr.write(`analytics: ${(e as Error).message}\n`);
       process.exit(1);
     }
 
@@ -122,14 +122,14 @@ async function main(): Promise<void> {
       process.stdout.write(JSON.stringify(result));
       process.exit(0);
     } catch (e) {
-      process.stderr.write(`v2:analytics: ${(e as Error).message}\n`);
+      process.stderr.write(`analytics: ${(e as Error).message}\n`);
       process.exit(1);
     }
   } else {
     // --metric mode (unchanged)
     if (!isMetricName(args.metric)) {
       process.stderr.write(
-        `v2:analytics: --metric must be one of toolCounts, errorRate, latency, projectRollup, timeBuckets (got ${args.metric})\n`,
+        `analytics: --metric must be one of toolCounts, errorRate, latency, projectRollup, timeBuckets (got ${args.metric})\n`,
       );
       process.exit(1);
     }
@@ -145,13 +145,13 @@ async function main(): Promise<void> {
       process.stdout.write(JSON.stringify({ metric, data }));
       process.exit(0);
     } catch (e) {
-      process.stderr.write(`v2:analytics: ${(e as Error).message}\n`);
+      process.stderr.write(`analytics: ${(e as Error).message}\n`);
       process.exit(1);
     }
   }
 }
 
-// Re-export buildQuery for potential external use; the guard is re-exported from @clogdy/shared.
+// Re-export buildQuery for potential external use; the guard is re-exported from @lllogs/shared.
 export { buildQuery };
 
 if (import.meta.main) {

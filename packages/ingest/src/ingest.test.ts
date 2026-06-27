@@ -17,7 +17,7 @@ function line(o: unknown): string {
 }
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-ingest-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-ingest-"));
   root = join(dir, "projects");
   dbPath = join(dir, "db", "c.db");
 

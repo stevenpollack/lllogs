@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "clogdy",
+      "name": "lllogs",
       "devDependencies": {
         "@playwright/test": "^1.61.1",
         "@types/bun": "^1.3.14",
@@ -16,11 +16,11 @@
       },
     },
     "packages/analytics": {
-      "name": "@clogdy/analytics",
+      "name": "@lllogs/analytics",
       "version": "0.0.0",
       "dependencies": {
-        "@clogdy/shared": "file:../shared",
         "@duckdb/node-api": "1.4.5-r.1",
+        "@lllogs/shared": "file:../shared",
         "pino": "^10.3.1",
       },
       "devDependencies": {
@@ -28,10 +28,10 @@
       },
     },
     "packages/ingest": {
-      "name": "@clogdy/ingest",
+      "name": "@lllogs/ingest",
       "version": "0.0.0",
       "dependencies": {
-        "@clogdy/shared": "file:../shared",
+        "@lllogs/shared": "file:../shared",
         "pino": "^10.3.1",
       },
       "devDependencies": {
@@ -39,20 +39,20 @@
       },
     },
     "packages/server": {
-      "name": "@clogdy/server",
+      "name": "@lllogs/server",
       "version": "0.0.0",
       "dependencies": {
-        "@clogdy/shared": "file:../shared",
+        "@lllogs/shared": "file:../shared",
         "hono": "^4.6.0",
         "pino": "^10.3.1",
       },
       "devDependencies": {
-        "@clogdy/ingest": "file:../ingest",
+        "@lllogs/ingest": "file:../ingest",
         "@types/bun": "^1.3.14",
       },
     },
     "packages/shared": {
-      "name": "@clogdy/shared",
+      "name": "@lllogs/shared",
       "version": "0.0.0",
       "dependencies": {
         "pino": "^10.3.1",
@@ -62,11 +62,11 @@
       },
     },
     "packages/tui": {
-      "name": "@clogdy/tui-v2",
+      "name": "@lllogs/tui",
       "version": "0.0.0",
       "dependencies": {
-        "@clogdy/server": "file:../server",
-        "@clogdy/shared": "file:../shared",
+        "@lllogs/server": "file:../server",
+        "@lllogs/shared": "file:../shared",
         "ink": "^7.1.0",
         "react": "^19.2.7",
       },
@@ -77,11 +77,11 @@
       },
     },
     "packages/web": {
-      "name": "@clogdy/web",
+      "name": "@lllogs/web",
       "version": "0.0.0",
       "dependencies": {
-        "@clogdy/shared": "file:../shared",
         "@codemirror/lang-sql": "^6.8.0",
+        "@lllogs/shared": "file:../shared",
         "@tanstack/react-table": "^8.20.0",
         "@tanstack/react-virtual": "^3.14.3",
         "@uiw/react-codemirror": "^4.23.0",
@@ -105,18 +105,6 @@
 
     "@babel/runtime": ["@babel/runtime@7.29.7", "", {}, "sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw=="],
 
-    "@clogdy/analytics": ["@clogdy/analytics@workspace:packages/analytics"],
-
-    "@clogdy/ingest": ["@clogdy/ingest@workspace:packages/ingest"],
-
-    "@clogdy/server": ["@clogdy/server@workspace:packages/server"],
-
-    "@clogdy/shared": ["@clogdy/shared@workspace:packages/shared"],
-
-    "@clogdy/tui-v2": ["@clogdy/tui-v2@workspace:packages/tui"],
-
-    "@clogdy/web": ["@clogdy/web@workspace:packages/web"],
-
     "@codemirror/autocomplete": ["@codemirror/autocomplete@6.20.3", "", { "dependencies": { "@codemirror/language": "^6.0.0", "@codemirror/state": "^6.0.0", "@codemirror/view": "^6.17.0", "@lezer/common": "^1.0.0" } }, "sha512-tlosUqb+3BbxCxZdu4tKeRghPFC+QM7q4X5YhKV2eCmPG+1r2F3f4AaSz5sCrFqUtX4Jh20VFTKecl16MgiV9g=="],
 
     "@codemirror/commands": ["@codemirror/commands@6.10.4", "", { "dependencies": { "@codemirror/language": "^6.0.0", "@codemirror/state": "^6.7.0", "@codemirror/view": "^6.27.0", "@lezer/common": "^1.1.0" } }, "sha512-Ryk9y9T0FFVF0cUGhAknveAyUOl/A1qReTFi+qPKtOh2Z9F4AUBz3XOrYD4ZEgZirdugVzHvd/2/Wcwy5OliTg=="],
@@ -133,7 +121,7 @@
 
     "@codemirror/theme-one-dark": ["@codemirror/theme-one-dark@6.1.3", "", { "dependencies": { "@codemirror/language": "^6.0.0", "@codemirror/state": "^6.0.0", "@codemirror/view": "^6.0.0", "@lezer/highlight": "^1.0.0" } }, "sha512-NzBdIvEJmx6fjeremiGp3t/okrLPYT0d9orIc7AFun8oZcRk58aejkqhv6spnz4MLAevrKNPMQYXEWMg4s+sKA=="],
 
-    "@codemirror/view": ["@codemirror/view@6.43.3", "", { "dependencies": { "@codemirror/state": "^6.7.0", "crelt": "^1.0.6", "style-mod": "^4.1.0", "w3c-keyname": "^2.2.4" } }, "sha512-MwEwCAr/o0agJefhC2+reBv5kfOQpMcDRUNQrRYZgWlhH8IwQcerMZrpqWyUFSyO0ebgN2cnh/w87F7G4BGSng=="],
+    "@codemirror/view": ["@codemirror/view@6.43.4", "", { "dependencies": { "@codemirror/state": "^6.7.0", "crelt": "^1.0.6", "style-mod": "^4.1.0", "w3c-keyname": "^2.2.4" } }, "sha512-YImu23iyKfncJzT7sRy+rEqEhSc8RhOHqDxwy4WzXRKJwYm6iwf/9OJk5ctCAdZ6yi2ZqaGEvmf55fSVqMDrgg=="],
 
     "@duckdb/node-api": ["@duckdb/node-api@1.4.5-r.1", "", { "dependencies": { "@duckdb/node-bindings": "1.4.5-r.1" } }, "sha512-lXPfeJclmhTGhBBnfVXy4siuGNpa8QaUIQGAWlDirC92Dq5fELdITI/LihiFDh5Gz7aM8AN9stCGIH891uv1oQ=="],
 
@@ -157,7 +145,19 @@
 
     "@lezer/lr": ["@lezer/lr@1.4.10", "", { "dependencies": { "@lezer/common": "^1.0.0" } }, "sha512-rnCpTIBafOx4mRp43xOxDJbFipJm/c0cia/V5TiGlhmMa+wsSdoGmUN3w5Bqrks/09Q/D4tNAmWaT8p6NRi77A=="],
 
-    "@marijn/find-cluster-break": ["@marijn/find-cluster-break@1.0.2", "", {}, "sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g=="],
+    "@lllogs/analytics": ["@lllogs/analytics@workspace:packages/analytics"],
+
+    "@lllogs/ingest": ["@lllogs/ingest@workspace:packages/ingest"],
+
+    "@lllogs/server": ["@lllogs/server@workspace:packages/server"],
+
+    "@lllogs/shared": ["@lllogs/shared@workspace:packages/shared"],
+
+    "@lllogs/tui": ["@lllogs/tui@workspace:packages/tui"],
+
+    "@lllogs/web": ["@lllogs/web@workspace:packages/web"],
+
+    "@marijn/find-cluster-break": ["@marijn/find-cluster-break@1.0.3", "", {}, "sha512-FY+MKLBoTsLNJF/eLWaOsXGdz6uh3Iu1axjPf6TUq92IYumcTcXWHoS747JARLkcdlJ/Waiaxc5wQfFO8jC6NA=="],
 
     "@oxfmt/binding-android-arm-eabi": ["@oxfmt/binding-android-arm-eabi@0.56.0", "", { "os": "android", "cpu": "arm" }, "sha512-CSCxi7ovYojgfdPOdUb9T508HKeAdDIKeRGg7x8IZwVJrWz9gVgX7MbUnFqtQAE4QvoNo07mj2JlwnOzJw4qqA=="],
 
@@ -253,11 +253,11 @@
 
     "@tanstack/react-table": ["@tanstack/react-table@8.21.3", "", { "dependencies": { "@tanstack/table-core": "8.21.3" }, "peerDependencies": { "react": ">=16.8", "react-dom": ">=16.8" } }, "sha512-5nNMTSETP4ykGegmVkhjcS8tTLW6Vl4axfEGQN3v0zdHYbK4UfoqfPChclTrJ4EoK9QynqAu9oUf8VEmrpZ5Ww=="],
 
-    "@tanstack/react-virtual": ["@tanstack/react-virtual@3.14.3", "", { "dependencies": { "@tanstack/virtual-core": "3.17.1" }, "peerDependencies": { "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-k/cnHPVaOfn46hSbiY6n4Dzf4QjCGWSF40zR5QIIYUqPAjpA6TN7InfYmcMiDVQGP2iUn9xsRbAl8u1v3UmeVQ=="],
+    "@tanstack/react-virtual": ["@tanstack/react-virtual@3.14.4", "", { "dependencies": { "@tanstack/virtual-core": "3.17.2" }, "peerDependencies": { "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-dZzAQP2uCDAd+9sAehqmx/DcU+B91Q4Gb0aDSM7t9bJvWDyGF9sapFNW5r1gNLsHs4wTb6ScZENJeYaHxJLiOw=="],
 
     "@tanstack/table-core": ["@tanstack/table-core@8.21.3", "", {}, "sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg=="],
 
-    "@tanstack/virtual-core": ["@tanstack/virtual-core@3.17.1", "", {}, "sha512-VZyW2Uiml5tmBZwPGrSD3Sz73OxzljQMCmzYHsUTPEuTsERf5xwa+uWb01xEzkz3ZSYTjj8NEb/mKHvgKxyZdA=="],
+    "@tanstack/virtual-core": ["@tanstack/virtual-core@3.17.2", "", {}, "sha512-w43MvWvmShpb6kIC9MOoLyUkLmRTLPjt61bHWs+X29hACSpX+n8DvgZ3qM7cUfflKlRRcHR9KVJE6TmcqnQvcA=="],
 
     "@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
@@ -307,7 +307,7 @@
 
     "convert-to-spaces": ["convert-to-spaces@2.0.1", "", {}, "sha512-rcQ1bsQO9799wq24uE5AM2tAILy4gXGIK/njFWcVQkGNZ96edlpY+A7bjwvzjYvLDyzmG1MmMLZhpcsb+klNMQ=="],
 
-    "crelt": ["crelt@1.0.6", "", {}, "sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g=="],
+    "crelt": ["crelt@1.0.7", "", {}, "sha512-aK6BbWfhf4U/wCcLHKPJl/xa6VkVstRaPywWtMKGwuOLc/wZTyQYuoxgvZnNsBvv7Kg3YTBQYYBCggcviQczuA=="],
 
     "csstype": ["csstype@3.2.3", "", {}, "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ=="],
 
@@ -319,7 +319,7 @@
 
     "environment": ["environment@1.1.0", "", {}, "sha512-xUtoPkMggbz0MPyPiIWr1Kp4aeWJjDZ6SMvURhimjdZgsRuDplF5/s9hcgGhyXMhs+6vpnuoiZ2kFiu3FMnS8Q=="],
 
-    "es-toolkit": ["es-toolkit@1.48.1", "", {}, "sha512-wfnXlwd5I75eXRtdD2vuEs50xHHESECDsGD7yiQnfFVNoa5522NwXEbmgo98LfiukSQHs+mBM7/YG3qKJB9/mQ=="],
+    "es-toolkit": ["es-toolkit@1.49.0", "", {}, "sha512-G5iZ6Pc/FNRY/soKZHC+TxGDD83rHUDXxzaWhGCX44vAv/tMs56WMusnm/KMNK+luUPsgA9U28cGr4RDlSzL2g=="],
 
     "escape-string-regexp": ["escape-string-regexp@2.0.0", "", {}, "sha512-UpzcLCXolUWcNu5HtVMHYdXJjArjsF9C0aNnquZYY4uW/Vu0miy5YoWvbV345HauVvcAUnpRuhMMcqTcGOY2+w=="],
 
@@ -483,28 +483,6 @@
 
     "yoga-layout": ["yoga-layout@3.2.1", "", {}, "sha512-0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ=="],
 
-    "@clogdy/analytics/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/ingest/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/server/@clogdy/ingest": ["@clogdy/ingest@file:packages/ingest", { "dependencies": { "@clogdy/shared": "file:../shared", "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/server/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/tui-v2/@clogdy/server": ["@clogdy/server@file:packages/server", { "dependencies": { "@clogdy/shared": "file:../shared", "hono": "^4.6.0", "pino": "^10.3.1" }, "devDependencies": { "@clogdy/ingest": "file:../ingest", "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/tui-v2/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/web/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
     "thread-stream/real-require": ["real-require@1.0.0", "", {}, "sha512-P4nbQYQfePJxRSmY+v/KINxVucm4NF3p3s7pJveMTtom52FR4YGltUQLB8idDXwDDWW+eYrWDFbuzUnjoWHF7g=="],
-
-    "@clogdy/server/@clogdy/ingest/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/tui-v2/@clogdy/server/@clogdy/ingest": ["@clogdy/ingest@file:packages/ingest", { "dependencies": { "@clogdy/shared": "file:../shared", "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/tui-v2/@clogdy/server/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
-
-    "@clogdy/tui-v2/@clogdy/server/@clogdy/ingest/@clogdy/shared": ["@clogdy/shared@file:packages/shared", { "dependencies": { "pino": "^10.3.1" }, "devDependencies": { "@types/bun": "^1.3.14" } }],
   }
 }

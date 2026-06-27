@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { openDb, runIngest } from "@clogdy/ingest";
+import { openDb, runIngest } from "@lllogs/ingest";
 import { createApp } from "./app";
 
 // ── Fixture tree ──────────────────────────────────────────────────────────────
@@ -19,9 +19,9 @@ let root: string;
 let dbPath: string;
 
 beforeAll(async () => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-e2e-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-e2e-"));
   root = join(dir, "projects");
-  dbPath = join(dir, "db", "clogdy.db");
+  dbPath = join(dir, "db", "lllogs.db");
 
   // P1 / S1 — prompt, Bash tool_use (ok result)
   const d1 = join(root, "proj-one-A");

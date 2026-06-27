@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
-import type { EventRow } from "@clogdy/shared";
-import { reconstructUnifiedDiff } from "@clogdy/shared";
+import type { EventRow } from "@lllogs/shared";
+import { reconstructUnifiedDiff } from "@lllogs/shared";
 import JsonView from "@uiw/react-json-view";
 import { darkTheme } from "@uiw/react-json-view/dark";
 import { parseDiff, Diff, Hunk, tokenize, markEdits } from "react-diff-view";

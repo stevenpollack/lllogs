@@ -2,6 +2,6 @@
 #
 # Default structured logging to silent during `bun test` so operational JSONL from
 # the in-process server/ingest loggers (and the ingest/analytics CLIs tests spawn)
-# doesn't clutter the run. See ./bun-test-setup.ts; override with CLOGDY_LOG_LEVEL.
+# doesn't clutter the run. See ./bun-test-setup.ts; override with LLLOGS_LOG_LEVEL.
 [test]
 preload = ["./bun-test-setup.ts"]

@@ -7,7 +7,7 @@ import { tail } from "./tailer";
 let dir: string;
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "clogdy-tail-"));
+  dir = mkdtempSync(join(tmpdir(), "lllogs-tail-"));
 });
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true });
